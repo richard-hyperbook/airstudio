@@ -11,21 +11,23 @@ const String kThemeModeKey = '__theme_mode__';
 // SharedPreferences? globalSharedPrefs;
 
 abstract class FlutterFlowTheme {
-  static Future initialize() async =>
+ /* static Future initialize() async =>
       globalSharedPrefs = await SharedPreferences.getInstance();
+*/
 
   static ThemeMode get themeMode {
-    final bool? darkMode = globalSharedPrefs?.getBool(kThemeModeKey);
-    return darkMode == null
-        ? ThemeMode.system
-        : darkMode
+    // final bool? darkMode = globalSharedPrefs?.getBool(kThemeModeKey);
+    return/* darkMode == null
+        ? */ThemeMode.system
+       /* : darkMode
             ? ThemeMode.dark
-            : ThemeMode.light;
+            : ThemeMode.light*/;
   }
-
+/*
   static void saveThemeMode(ThemeMode mode) => mode == ThemeMode.system
       ? globalSharedPrefs?.remove(kThemeModeKey)
       : globalSharedPrefs?.setBool(kThemeModeKey, mode == ThemeMode.dark);
+*/
 
   static FlutterFlowTheme of(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
@@ -48,6 +50,7 @@ abstract class FlutterFlowTheme {
   late Color secondaryText;
   late Color primaryBackground;
   late Color secondaryBackground;
+  late Color tertiaryBackground;
   late Color accent1;
   late Color accent2;
   late Color accent3;
@@ -142,16 +145,26 @@ class LightModeTheme extends FlutterFlowTheme {
   @Deprecated('Use tertiary instead')
   Color get tertiaryColor => tertiary;
 
-  late Color primary = const Color(0xFF4F46E5);
-  late Color secondary = const Color(0xFF3B82F6);
-  late Color tertiary = const Color(0xFFEC4899);
-  late Color alternate = const Color(0xFFEEF2F6);
-  late Color primaryText = const Color(0xFF0F172A);
-  late Color secondaryText = const Color(0xFF64748B);
-  late Color primaryBackground = const Color(0xFFF8FAFC);
-  late Color secondaryBackground = const Color(0xFFFFFFFF);
-  late Color accent1 = const Color(0xFF616161);
-  late Color accent2 = const Color(0xFF757575);
+  // late Color primary = const Color(0xFF4F46E5);
+  // late Color secondary = const Color(0xFF3B82F6);
+  // late Color tertiary = const Color(0xFFEC4899);
+  // late Color alternate = const Color(0xFFEEF2F6);
+  // late Color primaryText = const Color(0xFF0F172A);
+  // late Color secondaryText = const Color(0xFF64748B);
+  // late Color primaryBackground = const Color(0xFFF8FAFC);
+  // late Color secondaryBackground = const Color(0xFFFFFFFF);
+
+  late Color primary = const Color(0xFF235165);
+  late Color secondary = const Color(0xFF235165);
+  late Color tertiary = const Color(0xFFEBAB74);
+  late Color alternate = Colors.yellow;//const Color(0xFF1E293B);
+  late Color primaryText = Colors.black ;//const Color(0xFFF8FAFC);
+  late Color secondaryText = const Color(0xFF50A69A);
+  late Color primaryBackground = Colors.purple;//const Color(0xFF0F172A);
+  late Color secondaryBackground = Colors.yellow.shade100;//Color(0xFFD66B32);// const Color(0xFFEBAB74);
+  late Color tertiaryBackground = const Color(0xFF70C6BA);
+
+  late Color accent2 = const Color(0xFF757575);//#718397
   late Color accent3 = const Color(0xFFE0E0E0);
   late Color accent4 = const Color(0xFFEEEEEE);
   late Color success = const Color(0xFF10B981);
@@ -326,15 +339,22 @@ class DarkModeTheme extends FlutterFlowTheme {
   Color get secondaryColor => secondary;
   @Deprecated('Use tertiary instead')
   Color get tertiaryColor => tertiary;
-
-  late Color primary = const Color(0xFF6366F1);
-  late Color secondary = const Color(0xFF3B82F6);
-  late Color tertiary = const Color(0xFFF472B6);
-  late Color alternate = const Color(0xFF1E293B);
-  late Color primaryText = const Color(0xFFF8FAFC);
-  late Color secondaryText = const Color(0xFF94A3B8);
-  late Color primaryBackground = const Color(0xFF0F172A);
-  late Color secondaryBackground = const Color(0xFF1E293B);
+  late Color primary =  Colors.brown;//Color(0xFF275b70);//(0xFF6366F1);
+  late Color secondary = Colors.red;//Color(0xFF3B82F6);
+  late Color tertiary = Colors.orange;//const Color(0xFFF472B6);
+  late Color alternate = Colors.yellow;//const Color(0xFF1E293B);
+  late Color primaryText = Colors.green;//const Color(0xFFF8FAFC);
+  late Color secondaryText = Colors.blue;//const Color(0xFF94A3B8);
+  late Color primaryBackground = Colors.purple;//const Color(0xFF0F172A);
+  late Color secondaryBackground = Colors.grey; //const Color(0xFF1E293B);
+  // late Color primary = const Color(0xFF275b70);//(0xFF6366F1);
+  // late Color secondary = const Color(0xFF3B82F6);
+  // late Color tertiary = const Color(0xFFF472B6);
+  // late Color alternate = const Color(0xFF1E293B);
+  // late Color primaryText = const Color(0xFFF8FAFC);
+  // late Color secondaryText = const Color(0xFF94A3B8);
+  // late Color primaryBackground = const Color(0xFF0F172A);
+  // late Color secondaryBackground = const Color(0xFF1E293B);
   late Color accent1 = const Color(0xFFEEEEEE);
   late Color accent2 = const Color(0xFFE0E0E0);
   late Color accent3 = const Color(0xFF757575);

@@ -54,6 +54,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
 import 'package:intl/intl.dart' show DateFormat;
 import '../../custom_code/widgets/trimmer3.dart';
+import '../../session_display/session_display_widget.dart';
 
 http.Client _http = http.Client();
 
@@ -620,8 +621,10 @@ class _SessionStepDisplayWidgetState
       menuLabelList: ['Login'],
       menuIconList: [kIconLogin],
       menuTargets: [
-        (context) {
+        (context) async {
           //# context.goNamedAuth('login', context.mounted);
+          await storeAIRInCloud(currentSessionIndex);
+          print('(FF1)');
           Navigator.push(
             context,
             PageTransition(
@@ -665,7 +668,12 @@ class _SessionStepDisplayWidgetState
               key: scaffoldKey,
               backgroundColor: const Color(0xFFF5F5F5),
               appBar: AppBar(
-                leading: BackButton(color: Colors.white),
+                leading: BackButton(color: Colors.white,
+                onPressed: () async {
+                  await storeAIRInCloud(currentSessionIndex);
+                  print('(FF1)');
+                  Navigator.pop(context);
+                },),
                 backgroundColor: FlutterFlowTheme.of(context).primary,
                 automaticallyImplyLeading: false,
                 title: Text(

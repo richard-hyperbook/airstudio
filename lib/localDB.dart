@@ -40,6 +40,42 @@ const kTemplateIsMater = 'isMaster';
 const kTemplateCreatorId = 'creatorId';
 const kInfoKey = 'key';
 const kInfoValue = 'value';
+const kLogEmail = 'email';
+const kLogdateTime = 'dateTime';
+const kLogInfo = 'info';
+const kPurchasesEmail = 'email';
+const kPurchasesDetails = 'details';
+const kPurchasesPurchaseToken = 'purchaseToken';
+const kPurchasesProductId = 'productId';
+const kPurchasesTransactionDate = 'transactionDate';
+const kPurchasesTransactionId = 'transactionId';
+const kPurchasesSignatureAndroid = 'signatureAndroid';
+const kPurchasesActualDate = 'actualDate';
+const kPurchasesOriginalTransactionDateIOS = 'originalTransactionDateIOS';
+const kPurchasesOriginalTransactionIdentifierIOS  = 'originalTransactionIdentifierIOS';
+const kPurchasesTransactionReceipt  = 'transactionReceipt';
+const kPurchasesTransactionStateIOS  = 'transactionStateIOS';
+const kInfoNoOfSessionsFree = 'noOfSessionsFree';
+const kInfoNoOfSessionsSubscribed = 'noOfSessionsSubscribed';
+
+
+// const kPurchases = '';
+// const kPurchases = '';
+
+
+
+const kUserProductId = 'productId';
+const kUserApplicationUserName = 'applicationUserName';
+const kUserPurchaseID = 'purchaseID';
+const kUserPendingCompletePurchase = 'pendingCompletePurchase';
+const kUserPurchaseDetailsStatus = 'purchaseDetailsStatus';
+const kUserLocalVerificationData = 'localVerificationData';
+const kUserServerVerificationData = 'serverVerificationData';
+const kUserTransactionDateTime = 'transactionDateTime';
+const kUserCumulativeSessions = 'cumulativeSessions';
+const kUserPurchaseStatus = 'status';
+
+
 
 
 /*

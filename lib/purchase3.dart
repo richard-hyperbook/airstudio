@@ -12,14 +12,14 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 const String kProductIdMonthlyAndroid = 'airstudio';
 const String kProductIdMonthlyIOS = 'uk.co.hyperbook.airstudio.monthlysubscription';
 
-class InApp extends StatefulWidget {
-  InApp({Key? key}) : super(key: key);
+class Purchase3 extends StatefulWidget {
+  Purchase3({Key? key}) : super(key: key);
 
   @override
-  _InAppState createState() => new _InAppState();
+  _Purchase3State createState() => new _Purchase3State();
 }
 
-class _InAppState extends State<InApp> {
+class _Purchase3State extends State<Purchase3> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   late dynamic _purchaseUpdatedSubscription;

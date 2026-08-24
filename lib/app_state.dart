@@ -12,23 +12,23 @@ import 'flutter_flow/flutter_flow_theme.dart';
 import 'dart:math';
 import 'appwrite_interface.dart';
 
-final int versionNumber = 65 ;
+final int versionNumber = 85;
 
 
-late SharedPreferences globalSharedPrefs;
+// late SharedPreferences globalSharedPrefs;
 DocumentReference? _introductionHyperbook;
 
-Future initializePersistedState() async {
+/*Future initializePersistedState() async {
   globalSharedPrefs = await SharedPreferences.getInstance();
   _safeInit(() {
     _introductionHyperbook = DocumentReference(
       path: globalSharedPrefs.getString(
-          'ff_introductionHyperbook') /*?.ref ??
-              _introductionHyperbook*/
+          'ff_introductionHyperbook') *//*?.ref ??
+              _introductionHyperbook*//*
       ,
     );
   });
-}
+}*/
 
 ////////////////////////////////////////////
 
@@ -217,7 +217,7 @@ class FFAppState extends ChangeNotifier {
     _currentChapter = value;
   }
 
-  bool _filterByModerator = false;
+ /* bool _filterByModerator = false;
   bool get filterByModerator => _filterByModerator;
   set filterByModerator(bool value) {
     _filterByModerator = value;
@@ -230,7 +230,7 @@ class FFAppState extends ChangeNotifier {
         ? globalSharedPrefs.setString('ff_introductionHyperbook', value.path!)
         : globalSharedPrefs.remove('ff_introductionHyperbook');
   }
-
+*/
   bool _canReadCurrentHyperbook = false;
   bool get canReadCurrentHyperbook => _canReadCurrentHyperbook;
   set canReadCurrentHyperbook(bool value) {

@@ -204,9 +204,9 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
                         if (currentUser!.userLevel == kUserLevelNotLoggedIn) {
                           String colorString = '';
 
-                          globalSharedPrefs.setString(
+       /*                   globalSharedPrefs.setString(
                               currentUser!.reference!.path! + '.' + kConectedUserColors,
-                              colorString);
+                              colorString);*/
                           //>print('(SU70)${colorString}');
                         } else {
                           await updateDocument(
@@ -316,6 +316,8 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
         child: Scaffold(
             key: scaffoldKey,
             appBar: AppBar(
+
+              iconTheme: IconThemeData(color: Colors.white),
               leading: BackButton(
                   color: Colors.white,
                   onPressed: () {
@@ -337,20 +339,18 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
                     ),
               ),
               actions: [
-                 insertMenu(context: context, menuDetails: profileMenuDetails, externalSetState: setState),
-/*
-  InkWell(
-                  onTap: () async {
-                    // intro!.start(context);
-                    //--//////%//>print('(XI5)');
-                  },
-                  child: kIconInfoStartWhite,
-                ),*/
+                insertMenu(
+                    context: context,
+                    menuDetails: profileMenuDetails,
+                    externalSetState: setState,
+                    caption: 'Menu',
+                    width: 100,
+                    height: 50),
               ],
               centerTitle: false,
               elevation: 2.0,
             ),
-            backgroundColor: const Color(0xFFF1F4F8),
+            backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
             body: SafeArea(
               child: SingleChildScrollView(
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[

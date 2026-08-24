@@ -30,7 +30,17 @@ import 'appwrite_interface.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'conditional.dart';
 import 'app_state.dart';
-import '/custom_code/widgets/revenue_cat.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io' as dartio;
+// import 'package:in_app_purchase/in_app_purchase.dart';
+// import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+// import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+// import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
+// import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
+import 'package:platform/platform.dart';
+import 'consumable_store.dart';
+
+
 
 
 appwrite.Client? client;
@@ -42,20 +52,27 @@ String? loadingParameter;
 
 // ScrollController hyperbookDisplayscrollController = ScrollController();
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  setIsIncomingResetPassword();
 
+void main() async {
+  print('(AAU1)');
+  WidgetsFlutterBinding.ensureInitialized();
+  print('(AAU2)');
+  setIsIncomingResetPassword();
+  print('(AAU3)');
+  // loadJNI();
   // debugPrintRebuildDirtyWidgets = true;
-  client = appwrite.Client()
-      .setEndpoint("http://localhost/v1")
-      .setProject("67cd5b6e000fe41c331e");
-  appwrite.Account account = appwrite.Account(client!);
+  // client = appwrite.Client()
+  //     .setEndpoint("http://localhost/v1")
+  //     .setProject("67cd5b6e000fe41c331e");
+  // appwrite.Account account = appwrite.Account(client!);
   showLogoEtcOnMap = true;
   usePathUrlStrategy();
+  print('(AAU4)');
   // await initFirebase();
-  initAppwrite();
-  if (true) {
+  // dartio.Directory dir = await getApplicationDocumentsDirectory();
+  // print('(JN1)${dir.path}');
+// initAppwrite();
+/*  if (true) {
     // Only for debug mode.
     try {
       final emulatorHost =
@@ -70,13 +87,16 @@ void main() async {
       // ignore: avoid_print
       //>print('(N4000)$e');
     }
-  }
+  }*/
+  print('(AAU5)');
 
-  await FlutterFlowTheme.initialize();
+  // await FlutterFlowTheme.initialize();
   //>print('(SU8)${globalSharedPrefs}');
+  print('(AAU6)');
 
   final FFAppState appState = FFAppState(); // Initialize FFAppState
   // await appState.initializePersistedState();
+  print('(AAU7)');
 
   // await initializePersistedState();
   //>print('(SU6)${globalSharedPrefs}');
@@ -84,9 +104,9 @@ void main() async {
     create: (BuildContext context) => appState,
     child: MyApp(),
   ));
-  print('(RC30)');
-  await initializeRevenueCat();
-  print('(RC31)');
+  print('(AAU8)');
+
+  print('(AAU9)');
 
 }
 
@@ -118,36 +138,8 @@ class _MyAppState extends State<MyApp> {
   late AppStateNotifier _appStateNotifier;
   late GoRouter _router;
 
-  // final StreamSubscription<UsersRecord?> authUserSub =
-  //     authenticatedUserStream.listen((_) {});
-  // final StreamSubscription<Future<Map<String, dynamic>>> fcmTokenSub =
-  //     fcmTokenUserStream.listen((_) {});
-/*
-
-  Future<void> login(String email, String password) async {
-    await widget.account!
-        .createEmailPasswordSession(email: email, password: password);
-    final user = await widget.account!.get();
-    setState(() async {
-      loggedInUser = user;
-      //>print('(M2)${user}');
-      currentUser =
-          await getUser(document: DocumentReference(path: user.registration));
-      currentUserDisplayName = currentUser!.displayName!;
-      currentUserEmail = currentUser!.email!;
-    });
-  }
-*/
-
-/*
-  Future<void> register(String email, String password, String name) async {
-    await widget.account!.create(
-        userId: ID.unique(), email: email, password: password, name: name);
-    await login(email, password);
-  }
 
 
- */
   Future<void> logout() async {
     await widget.account!.deleteSession(sessionId: 'current');
     setState(() {
@@ -162,18 +154,12 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     /*M*/ //>print('(M50)');
     _appStateNotifier = AppStateNotifier.instance;
-    /*M*/ //>print('(M51)');
     _router = createRouter(_appStateNotifier);
-    /*M*/ //>print('(M52)');
-    // userStream = hyperbookFirebaseUserStream()
-    //   ..listen((BaseAuthUser user) => _appStateNotifier.update(user));
-    /*M*/ //>print('(M53)');
-    // jwtTokenStream.listen((_) {});
-    /*M*/ //>print('(M54)');
-    // SharedPreferences.setMockInitialValues({});
+
+
 
     Future.delayed(
-      const Duration(seconds: 1),
+      const Duration(milliseconds: 500),
       () {
         /*M*/ //>print('(M55)');
         _appStateNotifier.stopShowingSplashImage();
@@ -182,10 +168,17 @@ class _MyAppState extends State<MyApp> {
       },
     );
     //>print('(M57)');
-    setupTutorialUser(context);
-
+  //  setupTutorialUser(context);
+    _initAsync();
 
   }
+
+
+  Future<void> _initAsync() async {
+    await initAppwrite(); // safe: engine already initialized and on UI isolate
+    setState(() { /* ready */ });
+  }
+
 
   @override
   void dispose() {
@@ -200,7 +193,7 @@ class _MyAppState extends State<MyApp> {
 
   void setThemeMode(ThemeMode mode) => setState(() {
         _themeMode = mode;
-        FlutterFlowTheme.saveThemeMode(mode);
+
       });
 
   @override
@@ -380,4 +373,3 @@ class _NavBarPageState extends State<NavBarPage> {
     );
   }
 }
-

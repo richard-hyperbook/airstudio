@@ -61,20 +61,7 @@ class _ClientsPageWidgetState extends State<ClientsPageWidget> {
                   controller: nameController,
                   decoration: InputDecoration(hintText: 'Client Name'),
                 ),
-                // if (currentUser?.userLevel == kUserLevelSupervisor)
-                  // Row(
-                  //   children: [
-                  //     Checkbox(
-                  //       value: isMaster,
-                  //       onChanged: (val) {
-                  //         setDialogState(() {
-                  //           isMaster = val ?? false;
-                  //         });
-                  //       },
-                  //     ),
-                  //     Text('Master Template'),
-                  //   ],
-                  // ),
+
               ],
             ),
             actions: [
@@ -158,6 +145,7 @@ class _ClientsPageWidgetState extends State<ClientsPageWidget> {
             ),
           ]
       ),
+      backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(

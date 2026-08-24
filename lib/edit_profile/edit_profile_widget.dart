@@ -326,11 +326,11 @@ class _EditProfileWidgetState extends State<EditProfileWidget> {
                         if (currentUser!.userLevel == kUserLevelNotLoggedIn) {
                           String colorString = '';
 
-                          globalSharedPrefs.setString(
+/*                          globalSharedPrefs.setString(
                               currentUser!.reference!.path! +
                                   '.' +
                                   kConectedUserColors,
-                              colorString);
+                              colorString);*/
                           //>print('(SU70)${colorString}');
                         } else {
                           await updateDocument(

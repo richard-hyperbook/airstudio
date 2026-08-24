@@ -57,12 +57,12 @@ Widget insertMenu(
   return MenuAnchor(
     builder: (BuildContext context, MenuController controller, Widget? child) {
       return FlutterFlowIconButton(
-        enabled: true,
+        enabled: (currentUser != null),
         fillColor: Colors.white,
         tooltipMessage: 'Menu',
         borderColor: (caption == null) ? FlutterFlowTheme.of(context).primary : Colors.transparent,
         buttonWidth: width ?? kIconButtonWidth - 50,
-        borderRadius: (caption == null) ? 30 : 0,
+        borderRadius: (caption == null) ? 30 : 30,
         borderWidth: 1,
         buttonSize: height?? 40,
         caption: caption,
@@ -82,8 +82,8 @@ Widget insertMenu(
       (int index) => MenuItemButton(
         leadingIcon: menuDetails.menuIconList[index],
         style: ButtonStyle(
-            backgroundColor:
-                WidgetStateProperty.all(menuDetails.menuColorList[index])),
+            backgroundColor: WidgetStateProperty.all(FlutterFlowTheme.of(context).tertiaryBackground)),
+               // WidgetStateProperty.all(menuDetails.menuColorList[index])),
         onPressed: () {
           externalSetState!(() {
             //>print('(ME1)${index}++++${menuDetails.menuLabelList[index]}');

@@ -61,6 +61,12 @@ class _CreateAccountWidgetState extends State<CreateAccountWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: const Color(0xFF262D34),
+        appBar: AppBar(
+          title: Text('Create Account',
+              style: TextStyle(color: Colors.white)),
+          backgroundColor: FlutterFlowTheme.of(context).primary,
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
         body: Container(
           width: MediaQuery.sizeOf(context).width * 1.0,
           height: MediaQuery.sizeOf(context).height * 1.0,
@@ -79,51 +85,51 @@ class _CreateAccountWidgetState extends State<CreateAccountWidget> {
                 Row(
                   children: [
                     Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                        24.0,
-                        70.0,
-                        0.0,
-                        0.0,
-                      ),
-                      child: Row(
-                        children: <Widget>[
-                          SvgPicture.asset(
-                            'assets/images/brush3.svg',
-                            width: 100,
-                            height: 100,
+                      padding: const EdgeInsets.all(20.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          /* border: Border.all(
+                                          color: Colors.red,
+                                        ),*/
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.green,
+                        ),
+                        child: FittedBox(
+                          child: SvgPicture.asset(
+                            'assets/images/paintbrush2.svg',
+                            width: logoSize,
+                            height: logoSize,
                           ),
-                        ],
+                        ),
                       ),
                     ),
+
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FittedBox(
                         fit: BoxFit.contain,
                         child: Text(
-                          'Art Therapy AIR App',
+                          'AIR Studio',
                           overflow: TextOverflow.fade,
                           //   style: FlutterFlowTheme.of(context)
                           //      .headlineMedium,),
-                          style: TextStyle(
-                            fontSize: MediaQuery.sizeOf(context).width < 1000
-                                ? (MediaQuery.sizeOf(context).width < 500
-                                      ? 25
-                                      : 50)
-                                : 100,
+                          style: FlutterFlowTheme.of(
+                            context,
+                          ).displaySmall,
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ]),
+
+
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(
                     0.0,
-                    36.0,
+                    16.0,
                     0.0,
                     0.0,
                   ),
-                  child: Container(
+                  child:  Container(
                     width: MediaQuery.sizeOf(context).width * 0.9,
                     decoration: BoxDecoration(
                       color: FlutterFlowTheme.of(context).white,
@@ -153,7 +159,7 @@ class _CreateAccountWidgetState extends State<CreateAccountWidget> {
                                     'Get Started with AIR Studio',
                                     style: FlutterFlowTheme.of(
                                       context,
-                                    ).displaySmall,
+                                    ).displaySmall ,
                                   ),
                                 ),
                /*                 InkWell(
@@ -609,8 +615,8 @@ class _CreateAccountWidgetState extends State<CreateAccountWidget> {
                     ),
                   ),
                 ),
-              ],
-            ),
+
+            ]),
           ),
         ),
       ),

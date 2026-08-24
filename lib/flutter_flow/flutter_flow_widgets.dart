@@ -185,13 +185,13 @@ class _FFButtonWidgetState extends State<FFButtonWidget> {
         child: ElevatedButton.icon(
           icon: Padding(
             padding: widget.options.iconPadding ?? EdgeInsets.zero,
-            child: widget.icon ??
+            child: widget.icon /*??
                 FaIcon(
                   widget.iconData,
                   size: widget.options.iconSize,
                   color: widget.options.iconColor ??
                       widget.options.textStyle!.color,
-                ),
+                )*/,
           ),
           label: textWidget,
           onPressed: onPressed,

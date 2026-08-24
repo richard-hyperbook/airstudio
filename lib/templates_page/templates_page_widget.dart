@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import '../appwrite_interface.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
@@ -164,7 +165,7 @@ class _TemplatesPageWidgetState extends State<TemplatesPageWidget> {
         actions:[
           FlutterFlowIconButton(
             caption: 'Create\ntemplate',
-            buttonWidth: 120,
+            buttonWidth: 150,
             enabled: true,
             fillColor: Colors.white,
             tooltipMessage: 'Create Session',
@@ -179,6 +180,7 @@ class _TemplatesPageWidgetState extends State<TemplatesPageWidget> {
           ),
         ]
       ),
+      backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(

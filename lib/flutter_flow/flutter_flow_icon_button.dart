@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'flutter_flow_theme.dart';
 
 class FlutterFlowIconButton extends StatefulWidget {
   const FlutterFlowIconButton({
@@ -70,10 +71,11 @@ class _FlutterFlowIconButtonState extends State<FlutterFlowIconButton> {
     final bool isFontAwesome = widget.icon is FaIcon;
     if (isFontAwesome) {
       final FaIcon icon = widget.icon as FaIcon;
-      effectiveIcon = FaIcon(
+      /*effectiveIcon = FaIcon(
         icon.icon,
         size: icon.size,
-      );
+      );*/
+      effectiveIcon = widget.icon;
       iconSize = icon.size;
       iconColor = icon.color;
     } else {
@@ -132,7 +134,7 @@ class _FlutterFlowIconButtonState extends State<FlutterFlowIconButton> {
       shape: WidgetStateProperty.resolveWith<OutlinedBorder>(
         (Set<WidgetState> states) {
           return RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
+            borderRadius: BorderRadius.circular(widget.borderRadius ?? 20),
             side: BorderSide(
               color: widget.borderColor ?? Colors.transparent,
               width: widget.borderWidth ?? 0,
@@ -206,13 +208,14 @@ class _FlutterFlowIconButtonState extends State<FlutterFlowIconButton> {
                     width: 99,
                     height: 30,
                     decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(/*widget.borderRadius ??*/ 20),
                         border: Border.all(
                             width: 1,
                             color: widget.enabled ? Colors.black : Colors.grey),
                         color: ((widget.colorIfEnabled != null) &&
                                 (widget.enabled))
                             ? widget.colorIfEnabled
-                            : Colors.white),
+                            : FlutterFlowTheme.of(context).tertiaryBackground),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
