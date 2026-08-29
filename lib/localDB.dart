@@ -73,6 +73,7 @@ const kUserLocalVerificationData = 'localVerificationData';
 const kUserServerVerificationData = 'serverVerificationData';
 const kUserTransactionDateTime = 'transactionDateTime';
 const kUserCumulativeSessions = 'cumulativeSessions';
+const kUserArchiveSessions = 'archiveSessions';
 const kUserPurchaseStatus = 'status';
 
 

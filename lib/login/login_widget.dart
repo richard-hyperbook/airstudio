@@ -170,6 +170,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     if ((currentUser != null) && (currentUser!.role == kRoleSupervisor)) {
       isSupervisor = true;
     }
+    print('(FX3)${currentUser}');
     return Title(
         title: 'login',
         color: FlutterFlowTheme.of(context).primary.withAlpha(0XFF),
@@ -201,17 +202,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              24.0, 30.0, 0.0, 0.0),
-                          child: Row(children: []),
-                        ),
                         SizedBox(
                             width: MediaQuery.sizeOf(context).width * 0.95,
                             child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  SizedBox(width: 100),
+                                  SizedBox(width: 10),
                                   Container(
                                     decoration: BoxDecoration(
                                       /* border: Border.all(

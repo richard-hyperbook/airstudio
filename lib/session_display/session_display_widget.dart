@@ -110,7 +110,7 @@ class _SessionDisplayWidgetState
         children: [
           CircularProgressIndicator(),
           Container(
-              margin: EdgeInsets.only(left: 5), child: Text("   Loading")),
+              margin: EdgeInsets.only(left: 5), child: Text('   Please wait')),
         ],
       ),
     );
@@ -336,7 +336,6 @@ class _SessionDisplayWidgetState
         });
   }
 
-
   Widget showCreateArchiveButton(int index) {
     return FlutterFlowIconButton(
         showLoadingIndicator: true,
@@ -528,6 +527,8 @@ class _SessionDisplayWidgetState
                   icon: Icon(Icons.edit),
                   onPressed: () async {
                     FFAppState().update(() {});
+                    // print('(S1A)${session.clientId}');
+
                     // currentSession = session;
                     currentSessionIndex = index;
                     currentTherapist =
@@ -540,8 +541,10 @@ class _SessionDisplayWidgetState
                           kSessionSessionModified: true,
                         });
 
-                    print('(S1)${session.clientId}');
-                    await restoreAIRFromCloud(index);
+                    // print('(S1C)${session.clientId}');
+                    if (currentUser!.archiveSessions?? false) {
+                      await restoreAIRFromCloud(index);
+                    }
                     Navigator.push(
                         context,
                         PageTransition(
@@ -1578,12 +1581,11 @@ Future<void> restoreAIRFromCloud(int? index) async {
   _utf8Encoder = utf8.encoder;
   List<String> appDirPathList = await getAppDirListing();
   for (int j = 0; j < sessionSteps.length; j++) {
-    print('(DA51A)${j}....${sessionSteps[j].reference!.path}');
+    // print('(DA51A)${j}....${sessionSteps[j].reference!.path}');
     models.FileList filesOfStorageStep = await listStorageFilesOfStorageStep(
         bucketId: airsRef.path, sessionStepId: sessionSteps[j].reference!.path);
     for (int k = 0; k < filesOfStorageStep.files.length; k++) {
-      print(
-          '(DA52A)${k}....${filesOfStorageStep.files[k]},,,,${sessionSteps[j].reference!.path}');
+      // print('(DA52A)${k}....${filesOfStorageStep.files[k]},,,,${sessionSteps[j].reference!.path}');
       for (int l = 0; l < appDirPathList.length; l++) {
         final String filePath =
             appDirPath! + '/' + filesOfStorageStep.files[k].$id;
@@ -1592,8 +1594,7 @@ Future<void> restoreAIRFromCloud(int? index) async {
           fileId: filesOfStorageStep.files[k].$id,
           localPath: filePath,
         );
-        print(
-            '(DA53A)${k}....${l},,,,${filesOfStorageStep.files[k].$id}++++${filePath}');
+        // print('(DA53A)${k}....${l},,,,${filesOfStorageStep.files[k].$id}++++${filePath}');
       }
     }
   }
@@ -1603,30 +1604,35 @@ Future<void> storeAIRInCloud(int index) async {
   print('(DA50A)');
   SessionsRecord session = sessions![index];
   List<SessionStepsRecord> sessionSteps =
-  await listSessionStepList(thisSession: session);
+      await listSessionStepList(thisSession: session);
   _utf8Encoder = utf8.encoder;
-  List<String> appDirPathList = await getAppDirListing();
+  List<String> appDirPathList = await getSessionStepAppDirListing(session.reference!.path!);
   for (int j = 0; j < sessionSteps.length; j++) {
     print('(DA51B)${j}....${sessionSteps[j].reference!.path}');
     for (int k = 0; k < appDirPathList.length; k++) {
-      final String storageFileId = appDirPathList[k]
-          .split('/')
-          .last;
+      final String storageFileId = appDirPathList[k].split('/').last;
       print(
-          '(DA52B)${k}....${appDirPathList[k]},,,,${sessionSteps[j].reference!.path}++++${storageFileId}');
-      if ((appDirPathList[k]).contains(sessionSteps[j].reference!.path!)) {
-        print('(DA53B)${storageFileId}');
-        await deleteStorageFile(
-            bucketId: airsRef.path, fileId: storageFileId);
-      }
-        print('(DA54B)');
-        var response = await storeStorageFile(
-          bucketId: airsRef.path!,
-          storageFileId: storageFileId,
-          localFilePath: appDirPathList[k],
-        );
-        print('(DA55B)${k}....${appDirPathList[k]},,,,${response}');
+          '(DA53B)${k}....${appDirPathList[k]},,,,${sessionSteps[j].reference!.path}++++${storageFileId}');
+      // bool fileExists = false;
+      // for (int m = 0; m < storageFilesOfStep.files.length; m++){
+      //   if (storageFilesOfStep.files[m].$id.contains(storageFileId)){
+      //     fileExists = true;
+      //     break;
+      //   }
+      // }
+      // if (fileExists) {
+      //   print('(DA54B)${storageFileId}');
+      //   await deleteStorageFile(bucketId: airsRef.path, fileId: storageFileId);
+      // }
 
+      print('(DA55B)');
+      var response = await storeStorageFile(
+        bucketId: airsRef.path!,
+        storageFileId: storageFileId,
+        localFilePath: appDirPathList[k],
+        deleteIfNecessary: true,
+      );
+      print('(DA56B)${k}....${appDirPathList[k]},,,,${response}');
     }
   }
   await printAppDirListing();

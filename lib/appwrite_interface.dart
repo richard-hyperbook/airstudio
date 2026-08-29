@@ -416,6 +416,7 @@ class UsersRecord {
   // DateTime? transactionDateTime;
   int? cumulativeSessions;
   // String? purchaseStatus;
+  bool? archiveSessions;
 
   DocumentReference? userReference;
 
@@ -442,6 +443,7 @@ class UsersRecord {
     // this.transactionDateTime,
     this.cumulativeSessions,
     // required this.purchaseStatus,
+    this.archiveSessions,
   });
 
   /*  factory UsersRecord.fromJson(Map<String, dynamic> json) =>
@@ -607,14 +609,14 @@ Future<void> updateDocument({
   Map<String, dynamic>? data,
 }) async {
   // appwriteDatabases = Databases(client!);
-  print('(N2011C)${data}////${collection!.path}++++${document!.path}');
+  // print('(N2011C)${data}////${collection!.path}++++${document!.path}');
   models.Document doc = await appwriteDatabases!.updateDocument(
     databaseId: databaseRef.path!,
     collectionId: collection!.path!,
     documentId: document!.path!,
     data: data,
   );
-  print('(N2021D)${document.path}');
+  // print('(N2021D)${document.path}');
   return;
 }
 
@@ -1266,9 +1268,9 @@ Future<void> deleteTemplate(DocumentReference templateRef) async {
 
 Future<UsersRecord> getUser({DocumentReference? document}) async {
   models.Row row = await getRow(collection: usersRef, document: document);
-  print('(M1)${row.data}****${row.data['chapterColorInts']}');
+  // print('(M1)${row.data}****${row.data['chapterColorInts']}');
   List<int> colorInts = [];
-  print('(M1A)${row.data['displayName']}');
+  // print('(M1A)${row.data['displayName']}');
   UsersRecord u = UsersRecord(
     reference: document,
     email: (row.data[kUserEmail]) as String?,
@@ -1287,8 +1289,10 @@ Future<UsersRecord> getUser({DocumentReference? document}) async {
     // transactionDateTime: (row.data[kUserTransactionDateTime] as DateTime?),
     cumulativeSessions: (row.data[kUserCumulativeSessions] as int?),
     // purchaseStatus: (row.data[kUserPurchaseStatus] as String?),
+    archiveSessions: (row.data[kUserArchiveSessions] as bool?),
+
   );
-  print('(N2005)${u.email}');
+  // print('(N2005)${u.email}');
   return u;
 }
 
@@ -1469,8 +1473,7 @@ Future<List<SessionStepsRecord>> listSessionStepList({
     bool photoFileValid =
         await File(getFilePath(FileKind.photo, d.$id)).exists();
     bool audioFileValid = await File(getFilePath(FileKind.aac, d.$id)).exists();
-    print(
-        '(PE1)${appDirPath! + '/photo' + d.$id + '.jpg'}....${photoFileValid}');
+    print('(PE1)${appDirPath! + '/photo' + d.$id + '.jpg'}....${photoFileValid}');
 
     SessionStepsRecord h = SessionStepsRecord(
       reference: DocumentReference(path: d.$id),
@@ -1597,6 +1600,7 @@ Future<List<UsersRecord>> listUsersListWithEmail({String? email}) async {
       //   transactionDateTime: (d.data[kUserTransactionDateTime] as DateTime?),
       cumulativeSessions: (d.data[kUserCumulativeSessions] as int?),
       // purchaseStatus: (d.data[kUserPurchaseStatus] as String?),
+      archiveSessions: (d.data[kUserArchiveSessions] as bool?),
     );
     uu.add(u);
   }
@@ -1637,6 +1641,7 @@ Future<List<UsersRecord>> listUsersClientsOfUser(
       // transactionDateTime: (d.data[kUserTransactionDateTime] as DateTime?),
       cumulativeSessions: (d.data[kUserCumulativeSessions] as int?),
       // purchaseStatus: (d.data[kUserPurchaseStatus] as String?),
+      archiveSessions: (d.data[kUserArchiveSessions] as bool?),
     );
 
     uu.add(u);
@@ -1983,7 +1988,7 @@ Future<bool> copySessionStepStorageFiletoLocal({
     localBucketId = backupStorageRef.path!;
   }
   print('(DE70A)${fileId}....${localPath}');
-  printTempDirListing();
+  // printTempDirListing();
   String token = '';
   switch (fileKind) {
 /*    case FileKind.audio:
@@ -2102,19 +2107,19 @@ Future<bool> copyAnyStorageFiletoLocal({
 }
 
 Future<void> printTempDirListing() async {
-  final utf8Encoder = utf8.encoder;
+/*  final utf8Encoder = utf8.encoder;
   var dir = Directory.fromRawPath(utf8Encoder.convert(tempDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
     print('(TD2)${entity.path}');
-  }
+  }*/
 }
 
 Future<void> printAppDirListing() async {
-  final utf8Encoder = utf8.encoder;
+ /* final utf8Encoder = utf8.encoder;
   var dir = Directory.fromRawPath(utf8Encoder.convert(appDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
     print('(AD2)${entity.path}');
-  }
+  }*/
 }
 
 Future<void> emptyAppDir() async {
@@ -2146,6 +2151,19 @@ Future<List<String>> getAppDirListing() async {
   var dir = Directory.fromRawPath(utf8Encoder.convert(appDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
     result.add(entity.path);
+  }
+  print('(AD3)${result}');
+  return result;
+}
+
+Future<List<String>> getSessionStepAppDirListing(String sessionStepId) async {
+  final utf8Encoder = utf8.encoder;
+  List<String> result = [];
+  var dir = Directory.fromRawPath(utf8Encoder.convert(appDirPath!));
+  await for (var entity in dir.list(recursive: true, followLinks: false)) {
+    if (entity.path.contains(sessionStepId)) {
+      result.add(entity.path);
+    }
   }
   print('(AD3)${result}');
   return result;
@@ -2215,8 +2233,12 @@ Future<void> deleteStorageFile({
   required String? bucketId,
   required String? fileId,
 }) async {
-  await storage.deleteFile(bucketId: bucketId!, fileId: fileId!);
-  print('(AU110)${fileId}');
+  try {
+    await storage.deleteFile(bucketId: bucketId!, fileId: fileId!);
+  } catch (e) {
+    print('(AU110B)${fileId}....${e}');
+  }
+  print('(AU110A)${fileId}');
 }
 
 Future<models.FileList> listStorageFiles({String? bucketId}) async {
