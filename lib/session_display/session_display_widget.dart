@@ -36,13 +36,13 @@ import '../../login/login_widget.dart';
 //import '../../paypal/paypal_widget.dart';
 import '../../session_step_display/session_step_display_widget.dart';
 import '../../templates_page/templates_page_widget.dart';
-import 'package:ffmpeg_kit_flutter_new_min/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_min/session.dart';
+// import 'package:ffmpeg_kit_flutter_new_min/ffmpeg_kit.dart';
+// import 'package:ffmpeg_kit_flutter_new_min/session.dart';
 // import '../../platform/audio_recorder_platform.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:io';
 import 'dart:convert';
-import 'package:ffmpeg_kit_flutter_new_min/return_code.dart';
+// import 'package:ffmpeg_kit_flutter_new_min/return_code.dart';
 import 'package:image/image.dart' as image2;
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -53,25 +53,6 @@ import '../purchase3.dart';
 import 'package:davinci/davinci.dart';
 import 'package:appwrite/appwrite.dart';
 import 'generate_video.dart';
-
-class PreviewWidget extends StatelessWidget {
-  const PreviewWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 500,
-      height: 500,
-      color: Colors.orange,
-      child: const Center(
-        child: Text(
-          "This widget was not in widget tree",
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
-    );
-  }
-}
 
 Utf8Encoder? _utf8Encoder;
 int _count = 0;
@@ -129,6 +110,7 @@ class _SessionDisplayWidgetState
 
 
 
+/*
 
   Future<void> generateQuestionImage(BuildContext context,
       {String caption = 'Question', String filename = ''}) async {
@@ -151,6 +133,7 @@ class _SessionDisplayWidgetState
     );
     print('(FU4)${response}');
   }
+*/
 
 /*
   Future<bool> generateStepVideo(int step) async {

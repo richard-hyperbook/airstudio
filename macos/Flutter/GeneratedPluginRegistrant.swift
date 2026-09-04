@@ -9,7 +9,7 @@ import audio_session
 import audioplayers_darwin
 import desktop_webview_window
 import device_info_plus
-import ffmpeg_kit_flutter_new_min
+import ffmpeg_kit_flutter_new_video
 import file_selector_macos
 import flutter_inappwebview_macos
 import flutter_sound

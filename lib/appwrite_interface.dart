@@ -45,8 +45,8 @@ import 'package:video_player/video_player.dart';
 // import '../platform/audio_recorder_platform.dart';
 
 // part 'appwrite_interface.g.dart';
-import 'package:ffmpeg_kit_flutter_new_min/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_min/session.dart';
+import 'package:ffmpeg_kit_flutter_new_video/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new_video/session.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permissionHandler;
 
@@ -1901,7 +1901,8 @@ Future<String?> storeStorageFile({
   models.File result = await storage.createFile(
     bucketId: bucketId!,
     fileId: storageFileId!,
-    file: InputFile.fromPath(path: localFilePath!),
+    file: InputFile.fromPath(path: localFilePath!,
+    ),
   );
   print('(AU70C)${result},,,,${result.name}...${result.$id}');
   var file = await storage.getFile(bucketId: bucketId, fileId: storageFileId);
@@ -2107,11 +2108,19 @@ Future<bool> copyAnyStorageFiletoLocal({
 }
 
 Future<void> printTempDirListing() async {
-/*  final utf8Encoder = utf8.encoder;
+  final utf8Encoder = utf8.encoder;
   var dir = Directory.fromRawPath(utf8Encoder.convert(tempDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
     print('(TD2)${entity.path}');
-  }*/
+  }
+}
+
+Future<void> printFontsDirListing() async {
+  final utf8Encoder = utf8.encoder;
+  var dir = Directory.fromRawPath(utf8Encoder.convert('/system/fonts/'));
+  await for (var entity in dir.list(recursive: true, followLinks: false)) {
+    print('(FD2)${entity.path}');
+  }
 }
 
 Future<void> printAppDirListing() async {
@@ -2139,6 +2148,7 @@ Future<void> emptyTempDirOFPhotosVideosConcat() async {
     print('(TD9)${entity.path}');
     if ((entity.path.contains('photo')) ||
         (entity.path.contains('video')) ||
+        (entity.path.contains('question'))||
         (entity.path.contains('concat'))) {
       await entity.delete(recursive: false);
     }
@@ -2292,7 +2302,10 @@ Future<bool> doesStorageFileExist({String? bucketId, String? fileId}) async {
         Query.contains("name", fileId),
       ],
     );
-    print('(XY61)${fileList.files.length}');
+    print('(XY61A)${fileList.files.length}++++${fileId}');
+    for (var file in fileList.files){
+      print('(XY61B)${file.name}....${file.bucketId},,,,${file.signature}');
+    }
   } catch (e) {
     //>print('(XY9)${e.toString()}');
   }
