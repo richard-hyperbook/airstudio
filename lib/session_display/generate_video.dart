@@ -48,7 +48,7 @@ import 'dart:io' as Io;
 import 'package:image/image.dart' as superImage;
 import '../../clients_page/clients_page_widget.dart';
 import '../purchase3.dart';
-import 'package:davinci/davinci.dart';
+// import 'package:davinci/davinci.dart';
 import 'package:appwrite/appwrite.dart';
 
 List<SessionStepsRecord>? sessionStepsList;
@@ -59,6 +59,7 @@ Directory? dir;
 
 String lastPhotoPath = '';
 
+/*
 class PreviewWidget extends StatelessWidget {
   const PreviewWidget({super.key});
 
@@ -77,6 +78,7 @@ class PreviewWidget extends StatelessWidget {
     );
   }
 }
+*/
 
 Future<void> ffmpegCommand(String command) async {
   String logString = 'Logs will appear here...';
@@ -98,6 +100,7 @@ Future<void> ffmpegCommand(String command) async {
   print('(FFM4)${logString}');
 }
 
+/*
 Future<void> generateQuestionVideo(BuildContext context, {int step = 0}) async {
   final String filenamePNG = '${tempDirPath}/question_${step}.png';
   final String filenameJPG = '${tempDirPath}/question_${step}.jpg';
@@ -142,42 +145,42 @@ Future<void> generateQuestionVideo(BuildContext context, {int step = 0}) async {
   // File mp4File = File(tempVideoPath);
   // int vLength = await mp4File.length();
   // print('(FU16)${vLength}');
-  /*response = await storeStorageFile(
+  */
+/*response = await storeStorageFile(
     bucketId: airsRef.path!,
     storageFileId: ID.unique(),
     localFilePath: tempVideoPath,
     deleteIfNecessary: true,
-  );*/
-}
+  );*//*
 
-Future<bool> generateStepVideo(BuildContext context, {int step = 0}) async {
+}
+*/
+
+Future<bool> generateStepVideo(BuildContext context, {int step = 0, SessionsRecord? session}) async {
   SessionStepsRecord sessionStep = sessionStepsList![step];
   currentSessionStep = sessionStepsList![step];
   //sessionStepIndex = step;
   print('(VA10)${currentSessionStep!.reference!.path}....${step}');
   if (true /*(currentSessionStep!.audio!.path ?? '').length > 0*/) {
     if (true /*(currentSessionStep!.audio!.path ?? '').length > 0*/) {
-      // await setMaxVersionNumbersCurrentSessionStep();
-      // final int maxAudioVersion = currentSessionStep!.maxAudioVersion!;
-      // final int maxPhotoVersion = currentSessionStep!.maxPhotoVersion!;
-
       final String tempPhotoPath =
           '${tempDirPath}/photo_${(step).toString()}.jpg';
       final String questionImagePath =
           '${tempDirPath}/question_${(step).toString()}.jpg';
       final String tempVideoPath =
           '${tempDirPath}/video_${(step).toString()}.mp4';
-      print('(VA11)${tempPhotoPath}....${tempVideoPath}');
+      // print('(VA11)${tempPhotoPath}....${tempVideoPath}');
       String audioPath =
           getFilePath(FileKind.aac, sessionStepsList![step].reference!.path!);
       String tempAudioPath = '${tempDirPath}/audio_${(step).toString()}.wav';
       final String audioConvertCommand =
           '-y -i "${audioPath}" "${tempAudioPath}"';
       await ffmpegCommand(audioConvertCommand);
-      print(
-          '(VA12)${step}~~~${audioPath}====${generateAudioStorageFilenameMp3(sessionStep)}');
-      print(
-          '(VA13)${step}~~~~${generatePhotoStorageFilename(sessionStep)},,,,${tempPhotoPath}====');
+
+      // print(
+      //     '(VA12)${step}~~~${audioPath}====${generateAudioStorageFilenameMp3(sessionStep)}');
+      // print(
+      //     '(VA13)${step}~~~~${generatePhotoStorageFilename(sessionStep)},,,,${tempPhotoPath}====');
       String sourcePhotoFilePath =
           getFilePath(FileKind.photo, sessionStepsList![step].reference!.path!);
       if (!(await isFileInAppDir(sourcePhotoFilePath))) {
@@ -205,40 +208,28 @@ Future<bool> generateStepVideo(BuildContext context, {int step = 0}) async {
           height: 500,
         ),
       );
-
-      print('(VA15)${step},,,,${tempPhotoPath}++++${questionImagePath}<');
+      // print('(VA15)${step},,,,${tempPhotoPath}++++${questionImagePath}<');
       dir = Directory.fromRawPath(utf8Encoder!.convert(tempDirPath!));
-
       final String command =
           '-loop 1 -i "${tempPhotoPath}" -i "${tempAudioPath}" -shortest "${tempVideoPath}"';
-      print('(VA17)${command}');
+      // print('(VA17)${command}');
       await ffmpegCommand(command);
       //  print('(VC5A)${ffMpegResponse.getReturnCode()}....${ffMpegResponse.getState()},,,,${videoPath}');
-      /* int maxVideoVersion = await getMaxVersionNumber(
-            bucketId: artTheopyAIRvideosRef.path!,
-            fileId: sessions![currentSessionIndex].reference!.path!);*/
-
-      FFmpegKit.execute('-i ${tempDirPath}/video_${step.toString()}.mp4 -c:v mpeg4 ${tempDirPath}/info.mp4}')
-          .then((session) async {
-        var logs = await session.getLogs();
-        for (var log in logs){
-          print('(VA17Z)${log.getMessage()}');
-        }
-      });
-      // final String questionVideoCommand =
-      // '''-f lavfi -i color=size=500x500:duration=10:rate=30:color=blue -vf "drawtext=fontfile=/system/fonts/DroidSans.ttf:fontsize=30:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:text='Stack Overflow'" ${tempDirPath}/question_${step.toString()}.mp4''';
+      final String questionText = sessionStep.question!;
       final String questionVideoCommand =
-      '''-f lavfi -i color=size=500x500:duration=2:rate=30:color=black -vf "drawtext=fontfile=/system/fonts/DroidSans.ttf:fontsize=30:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:text='Stack Overflow'" -pix_fmt yuv420p ${tempDirPath}/question_${step.toString()}.mp4''';
+      '''-f lavfi -i color=size=500x500:duration=2:rate=30:color=black -vf "drawtext=fontfile=/system/fonts/DroidSans.ttf:fontsize=30:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:text='${questionText}'" -pix_fmt yuv420p ${tempDirPath}/question_${step.toString()}.mp4''';
       await ffmpegCommand(questionVideoCommand);
       String videoStorageId =
           generateVideoStorageFilename(sessions![currentSessionIndex]);
-      print('(VA21)${videoStorageId},,,,${tempVideoPath}');
+      // print('(VA21)${videoStorageId},,,,${tempVideoPath}++++${questionText}');
+/*
       await storeStorageFile(
        bucketId: artTheopyAIRvideosRef.path,
          storageFileId:  'question_${step.toString()}.mp4',
          localFilePath: '${tempDirPath}/question_${step.toString()}.mp4',
          deleteIfNecessary: true,
        );
+*/
     }
   }
   return true;
@@ -246,55 +237,57 @@ Future<bool> generateStepVideo(BuildContext context, {int step = 0}) async {
 
 Future<void> makeVideo(BuildContext context,
     {int index = 0, SessionsRecord? session, StateSetter? setState}) async {
-  print(
-      '(FW1)${index}....${sessions![index].videoCreated},,,,${!session!.sessionModified!}++++${((sessions![index].videoCreated!) && (!session!.sessionModified!))}~~~~${session.reference}');
-/*  ((sessions![index].videoCreated!) && (!session!.sessionModified!))
-      ? null
-      : () async {*/
-  //currentSession = sessions![index];
-  print('(FW2)${index}');
+  // print(
+  //     '(FW1)${index}....${sessions![index].videoCreated},,,,${!session!.sessionModified!}++++${((sessions![index].videoCreated!) && (!session!.sessionModified!))}~~~~${session.reference}');
+  // print('(FW2)${index}');
   currentSessionIndex = index;
   // showAlertDialog(context);
   sessionStepsList = await listSessionStepList(thisSession: sessions![index]);
   // tempDirPath = await getTempDir
   await emptyTempDirOFPhotosVideosConcat();
-  print('(VA1)${tempDirPath}....${sessionStepsList!.length}');
+  // print('(VA1)${tempDirPath}....${sessionStepsList!.length}');
   await printTempDirListing();
   utf8Encoder = utf8.encoder;
   dir = Directory.fromRawPath(utf8Encoder!.convert(tempDirPath!));
   String concatList = '';
   for (int i = 0; i < sessionStepsList!.length; i++) {
-    print('(VA6A)${sessionStepsList!.length}....${i}');
+    // print('(VA6A)${sessionStepsList!.length}....${i}');
     // await generateQuestionVideo(context, step: i);
-    bool ok = await generateStepVideo(context, step: i);
-    if (!ok) {
-      print('(VA6B)${sessionStepsList!.length}....${i}');
-      Navigator.pop(context);
-      return;
+    await generateStepVideo(context, step: i, session: session);
+    if (true){
+      // final String silentVideoCommand =
+    // '-f lavfi -i color=size=500x500:rate=25:color=green -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -t 2 "${tempDirPath}/empty.mp4"';
+      final String silentVideoCommand =
+      '-f lavfi -t 5 -i color=c=blue:s=500x500 -f lavfi -t 2 -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:v libx264 -tune stillimage -pix_fmt yuv420p "${tempDirPath}/empty.mp4"';
+    await ffmpegCommand(silentVideoCommand);
+      // concatList = concatList + "file '${tempDirPath}/empty.mp4'\n";
     }
-    concatList = concatList + "file '${tempDirPath}/question_${i.toString()}.mp4'\n";
+    // concatList = concatList + "file '${tempDirPath}/video_${i.toString()}.mp4'\n";
+    // concatList = concatList + "file '${tempDirPath}/question_${i.toString()}.mp4'\n";
+    concatList = concatList + "file '${tempDirPath}/empty.mp4'\n";
     concatList = concatList + "file '${tempDirPath}/video_${i.toString()}.mp4'\n";
+
   }
   final File concatFile =
   await File("${tempDirPath}/concat.txt").writeAsString(concatList);
   String conatContents = await File("${tempDirPath}/concat.txt").readAsString();
   print('(VA31)${concatList}....${tempDirPath}/concat.txt}++++${conatContents}');
-  await printTempDirListing();
+  // await printTempDirListing();
   final String concatedVideo = "${tempDirPath}/video.mp4";
   final String concatCommand =
       '-y -safe 0 -f concat -i ${tempDirPath}/concat.txt -c copy "${concatedVideo}"';
-  print('(VA32)${concatedVideo}....${concatCommand}');
+  // print('(VA32)${concatedVideo}....${concatCommand}');
   await ffmpegCommand(concatCommand);
   models.FileList fileList =
       await listStorageFiles(bucketId: artTheopyAIRvideosRef.path);
   String fileId = '';
-  for (int i = 0; i < fileList.files.length; i++) {
+  /*for (int i = 0; i < fileList.files.length; i++) {
     if ((fileList.files[i].$id)
         .contains(sessions![currentSessionIndex].reference!.path!)) {
       fileId = fileList.files[i].$id;
       break;
     }
-  }
+  }*/
  /* FFmpegKit.execute('-i ${concatedVideo} -c:v mpeg4 ${tempDirPath}/info.mp4}')
       .then((session) async {
         var logs = await session.getLogs();
@@ -307,18 +300,17 @@ Future<void> makeVideo(BuildContext context,
     await deleteStorageFile(
         bucketId: artTheopyAIRvideosRef.path, fileId: fileId);
   }
-  print('(VA36B)${concatedVideo}....${generateVideoStorageFilename(
-    session!,
-  )}');
+  print('(VA36B)${concatedVideo}....${generateVideoStorageFilename(session!)}');
   var response = await storeStorageFile(
     bucketId: artTheopyAIRvideosRef.path!,
     storageFileId: generateVideoStorageFilename(
       session,
     ),
     localFilePath: concatedVideo,
+    deleteIfNecessary: true,
   );
-  print(
-      '(VA37)${concatedVideo}....${response}~~~~${currentSessionIndex}****${sessions!.length}');
+  // print(
+  //     '(VA37)${concatedVideo}....${response}~~~~${currentSessionIndex}****${sessions!.length}');
   await updateDocument(
       collection: sessionsRef,
       document: sessions![currentSessionIndex].reference,
@@ -327,8 +319,8 @@ Future<void> makeVideo(BuildContext context,
     sessions![currentSessionIndex].videoCreated = true;
     sessions![currentSessionIndex].sessionModified = false;
   });
-  print(
-      '(VA38)${sessions![currentSessionIndex].videoCreated}++++${sessions![currentSessionIndex].sessionModified}----${concatedVideo}....${currentSessionIndex}****${sessions!.length}');
+  // print(
+  //     '(VA38)${sessions![currentSessionIndex].videoCreated}++++${sessions![currentSessionIndex].sessionModified}----${concatedVideo}....${currentSessionIndex}****${sessions!.length}');
   // Navigator.pop(context);
   // String  command =
   // " -y -framerate 1 -pattern_type sequence -i $pictureFilenames -c:v libx264 -r 30 -pix_fmt yuv420p ${generatedFile.path}";

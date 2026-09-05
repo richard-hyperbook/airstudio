@@ -1892,10 +1892,10 @@ Future<String?> storeStorageFile({
 }) async {
   print('(AU70A)${bucketId},,,,${storageFileId}...${localFilePath}');
   if (deleteIfNecessary) {
-    if (await doesStorageFileExist(bucketId: bucketId, fileId: storageFileId)) {
+    // if (await doesStorageFileExist(bucketId: bucketId, fileId: storageFileId)) {
       await deleteStorageFile(bucketId: bucketId, fileId: storageFileId);
       print('(AU71)');
-    }
+    // }
   }
   print('(AU70B)${bucketId},,,,${storageFileId}...${localFilePath}');
   models.File result = await storage.createFile(
@@ -2150,7 +2150,8 @@ Future<void> emptyTempDirOFPhotosVideosConcat() async {
         (entity.path.contains('video')) ||
         (entity.path.contains('question'))||
         (entity.path.contains('concat'))) {
-      await entity.delete(recursive: false);
+      await entity.delete(recursive: true);
+      printTempDirListing();
     }
   }
 }

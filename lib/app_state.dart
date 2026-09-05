@@ -12,25 +12,12 @@ import 'flutter_flow/flutter_flow_theme.dart';
 import 'dart:math';
 import 'appwrite_interface.dart';
 
-final int versionNumber = 88;
+final int versionNumber = 89;
 
 
 // late SharedPreferences globalSharedPrefs;
 DocumentReference? _introductionHyperbook;
 
-/*Future initializePersistedState() async {
-  globalSharedPrefs = await SharedPreferences.getInstance();
-  _safeInit(() {
-    _introductionHyperbook = DocumentReference(
-      path: globalSharedPrefs.getString(
-          'ff_introductionHyperbook') *//*?.ref ??
-              _introductionHyperbook*//*
-      ,
-    );
-  });
-}*/
-
-////////////////////////////////////////////
 
 class FFAppState extends ChangeNotifier {
   factory FFAppState() {
