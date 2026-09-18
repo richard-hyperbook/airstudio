@@ -632,7 +632,7 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
                                                     i++) {
                                                   print(
                                                       '(DD2)${sessions[i].reference!.path}');
-                                                  await deleteAIR(sessions[i]);
+                                                  await deleteAIR(i);
                                                 }
 
                                                 await deleteDocument(

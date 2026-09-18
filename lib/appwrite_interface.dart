@@ -334,6 +334,12 @@ class SessionsRecord {
   VideoPlayerController? videoController;
   DateTime? $createdAt;
   DateTime? $updatedAt;
+  String progressText1 = '';
+  String progressText2 = '';
+  String progressText3 = '';
+  double progressValue = 0;
+  int totalSteps = 0;
+
 
   SessionsRecord({
     this.reference,
@@ -345,7 +351,9 @@ class SessionsRecord {
     required this.sessionModified,
     this.$createdAt,
     this.$updatedAt,
-  });
+  }){
+    print('(FFM8A)${progressText1}....${progressValue}');
+  }
 
   /* factory SessionStepsRecord.fromJson(Map<String, dynamic> json) =>
       _$SessionStepsRecordFromJson(json);
@@ -1323,7 +1331,7 @@ String generateVideoStorageFilename(
 Future<List<SessionsRecord>> listSessionList({
   bool justCurrentUserAsTherapist = true,
 }) async {
-  //>print('(N12)${justCurrentUserAsModerator}');
+  print('(FFM6C)${justCurrentUserAsTherapist}');
   models.DocumentList docs;
   if (justCurrentUserAsTherapist) {
     docs = await listDocumentsWithOneQueryDocumentReference(
@@ -1340,7 +1348,7 @@ Future<List<SessionsRecord>> listSessionList({
   }
   List<SessionsRecord> hh = [];
   for (models.Document d in docs.documents) {
-    //>print('(N1)${d.$id}&&&&${d.data}');
+    print('(FFM6B)${d.$id}&&&&${d.data}');
     UsersRecord clientsRecord = await getUser(
       document: DocumentReference(path: (d.data[kSessionClientId] as String?)),
     );
@@ -1434,17 +1442,22 @@ Future<int> getMaxVersionNumber({
 */
 
 Future<List<SessionStepsRecord>> listSessionStepList({
-  required SessionsRecord? thisSession,
+  required int thisSessionIndex,
 }) async {
-  print('(DE410D)${sessionStepsRef.path}....${thisSession}');
+
   models.DocumentList docs;
+  SessionsRecord thisSession = sessions![thisSessionIndex];
+  print('(FFM9A)${sessionStepsRef.path}....${thisSessionIndex}++++${thisSession}');
   if (thisSession != null) {
+    print('(FFM9B)${thisSessionIndex}');
     docs = await listDocumentsWithOneQueryDocumentReference(
       collection: sessionStepsRef,
       attribute: kSessionStepSessionId,
-      value: thisSession!.reference,
+      value: thisSession.reference,
       orderByAttribute: kSessionStepIndex,
     );
+    sessions![thisSessionIndex].totalSteps = docs.total;
+    print('(FFM9C)${thisSessionIndex}....${sessions![thisSessionIndex].totalSteps},,,,${docs.documents.length}');
   } else {
     docs = await listDocuments(
       collection: sessionsRef,
@@ -1521,7 +1534,7 @@ Future<SessionsRecord> getSession({DocumentReference? document}) async {
     collection: sessionsRef,
     document: document,
   );
-  ////>print('(M1)${doc.data['chapterColorInts'].runtimeType}****${doc.data['chapterColorInts']}');
+  print('(FFM6A)${document}****${document!.path}');
   SessionsRecord h = SessionsRecord(
     reference: DocumentReference(path: d.$id),
     clientId: DocumentReference(path: (d.data[kSessionClientId] as String?)),

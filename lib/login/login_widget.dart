@@ -938,8 +938,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                                                   List<SessionStepsRecord>
                                                                       sessionsSteps =
                                                                       await listSessionStepList(
-                                                                          thisSession:
-                                                                              sessions[i]);
+                                                                          thisSessionIndex: i);
                                                                   for (int j =
                                                                           0;
                                                                       j <

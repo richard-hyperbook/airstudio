@@ -58,6 +58,7 @@ Utf8Encoder? _utf8Encoder;
 int _count = 0;
 bool _iHaveRequests = false;
 List<DocumentReference?> _hyperbookListRequesting = [];
+String failureMessage = '';
 
 class SessionDisplayWidget extends StatefulWidget {
   const SessionDisplayWidget({super.key});
@@ -107,8 +108,6 @@ class _SessionDisplayWidgetState
     }
     super.dispose();
   }
-
-
 
 /*
 
@@ -278,8 +277,8 @@ class _SessionDisplayWidgetState
                       TextButton(
                         onPressed: () async {
                           print('(DA23)');
-                          SessionsRecord session = sessions![index];
-                          await deleteAIR(session);
+                          //SessionsRecord session = sessions![index];
+                          await deleteAIR(index);
                           context.pop();
                         },
                         child: const Text('Confirm'),
@@ -305,7 +304,7 @@ class _SessionDisplayWidgetState
         onPressed: /*(!session.videoCreated!) ? null :*/
             () async {
           SessionStepsRecord firstSessionStep =
-              (await listSessionStepList(thisSession: sessions![index])).first;
+              (await listSessionStepList(thisSessionIndex: index)).first;
           bool archiveExists = await doesStorageFileExist(
               bucketId: airsRef.path,
               fileId: 'aac' + firstSessionStep.reference!.path! + '.aac');
@@ -357,7 +356,7 @@ class _SessionDisplayWidgetState
         onPressed: /*(!session.videoCreated!) ? null :*/
             () async {
           SessionStepsRecord firstSessionStep =
-              (await listSessionStepList(thisSession: sessions![index])).first;
+              (await listSessionStepList(thisSessionIndex: index)).first;
           bool archiveExists = await doesStorageFileExist(
               bucketId: airsRef.path,
               fileId: 'aac' + firstSessionStep.reference!.path! + '.aac');
@@ -397,8 +396,8 @@ class _SessionDisplayWidgetState
         });
   }
 
-  Widget displaySession(SessionsRecord session, int index) {
-    print('(VC50A)${index}....${session}');
+  Widget displaySession(SessionsRecord session, int sessionIndex) {
+    print('(VC50A)${sessionIndex}....${session}');
     if (session.videoCreated == null) {
       session.videoCreated = false;
     }
@@ -407,7 +406,7 @@ class _SessionDisplayWidgetState
     }
     print(
         '(VC50B)${session.videoCreated}....${session.sessionModified},,,,${((session.videoCreated!) && (!session.sessionModified!))}');
-    print('(MV99)${sessions![index].videoCreated!}');
+    print('(MV99)${sessions![sessionIndex].videoCreated!}');
     return Material(
       color: Colors.transparent,
       elevation: 5.0,
@@ -431,438 +430,483 @@ class _SessionDisplayWidgetState
             width: 1.0,
           ),
         ),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                // key: infoCount == 1
-                // ? intro!.keys[2]
-                // : UniqueKey(),
-                child: Text(
-                  'Client: ${session.clientDisplayName}',
-                  softWrap: false,
-                  style: FlutterFlowTheme.of(context).bodyMedium,
-                ),
-              ),
-              SingleChildScrollView(
-                // key: infoCount == 1
-                //     ? intro!.keys[3]
-                //     : UniqueKey(),
-                scrollDirection: Axis.horizontal,
-                child: Text(
-                  softWrap: false,
-                  'Date: ${(DateFormat.yMMMd().format(session.$createdAt!))}',
-                  style: FlutterFlowTheme.of(context).bodyMedium,
-                ),
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  // key: infoCount == 1
-                  //     ? intro!.keys[4]
-                  //     : UniqueKey(),
-                  children: <Widget>[
-                    Text(
-                      '',
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    // key: infoCount == 1
+                    // ? intro!.keys[2]
+                    // : UniqueKey(),
+                    child: Text(
+                      'Client: ${session.clientDisplayName}',
+                      softWrap: false,
                       style: FlutterFlowTheme.of(context).bodyMedium,
                     ),
-                  ],
-                ),
-              ),
-              Row(children: [
-                FlutterFlowIconButton(
-                  caption: 'Edit',
-                  tooltipMessage: 'Edit session',
-                  borderColor: Colors.transparent,
-                  borderRadius: 0.0,
-                  borderWidth: 1.0,
-                  buttonSize: 40.0,
-                  buttonWidth: kSessionIconButtonWidth,
-                  icon: Icon(Icons.edit),
-                  onPressed: () async {
-                    FFAppState().update(() {});
-                    // print('(S1A)${session.clientId}');
+                  ),
+                  SingleChildScrollView(
+                    // key: infoCount == 1
+                    //     ? intro!.keys[3]
+                    //     : UniqueKey(),
+                    scrollDirection: Axis.horizontal,
+                    child: Text(
+                      softWrap: false,
+                      'Date: ${(DateFormat.yMMMd().format(session.$createdAt!))}',
+                      style: FlutterFlowTheme.of(context).bodyMedium,
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      // key: infoCount == 1
+                      //     ? intro!.keys[4]
+                      //     : UniqueKey(),
+                      children: <Widget>[
+                        Text(
+                          '',
+                          style: FlutterFlowTheme.of(context).bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(children: [
+                    FlutterFlowIconButton(
+                      caption: 'Edit',
+                      tooltipMessage: 'Edit session',
+                      borderColor: Colors.transparent,
+                      borderRadius: 0.0,
+                      borderWidth: 1.0,
+                      buttonSize: 40.0,
+                      buttonWidth: kSessionIconButtonWidth,
+                      icon: Icon(Icons.edit),
+                      onPressed: () async {
+                        FFAppState().update(() {});
+                        // print('(S1A)${session.clientId}');
 
-                    // currentSession = session;
-                    currentSessionIndex = index;
-                    currentTherapist =
-                        await getUser(document: session.therapistId);
-                    currentClient = await getUser(document: session.clientId);
-                    await updateDocument(
-                        collection: sessionsRef,
-                        document: sessions![currentSessionIndex].reference,
-                        data: {
-                          kSessionSessionModified: true,
-                        });
-
-                    // print('(S1C)${session.clientId}');
-                    if (currentUser!.archiveSessions ?? false) {
-                      await restoreAIRFromCloud(index);
-                    }
-                    Navigator.push(
-                        context,
-                        PageTransition(
-                          type: kStandardPageTransitionType,
-                          duration: kStandardTransitionTime,
-                          reverseDuration: kStandardReverseTransitionTime,
-                          child: SessionStepDisplayWidget(),
-                        )).then((_) => setState(() {}));
-                  },
-                ),
-              ]),
-              SizedBox(height: kIconButtonGap),
-              FlutterFlowIconButton(
-                // showLoadingIndicator: true
-                caption:
-                    ((session.videoCreated!) && (!session.sessionModified!))
-                        ? 'Video available'
-                        : 'Make video',
-                tooltipMessage: 'Speech to text',
-                borderColor: Colors.transparent,
-                borderRadius: 0.0,
-                borderWidth: 1.0,
-                buttonSize: 40.0,
-                buttonWidth: kSessionIconButtonWidth,
-                icon: Icon(Icons.movie),
-
-                onPressed:() async {
-                  await makeVideo(context, index: index,
-                      session: session,
-                      setState: setState);
-                  context.pop();
-                }
-                /*((sessions![index].videoCreated!) &&
-                        (!session.sessionModified!))
-                    ? null
-                    : () async {
-                        currentSessionIndex = index;
-                        // showAlertDialog(context);
-                        sessionStepsList = await listSessionStepList(
-                            thisSession: sessions![index]);
-                        await emptyTempDirOFPhotosVideosConcat();
-                        _utf8Encoder = utf8.encoder;
-                        dir = Directory.fromRawPath(
-                            _utf8Encoder!.convert(tempDirPath!));
-                        String concatList = '';
-                        for (int i = 0; i < sessionStepsList!.length; i++) {
-                          bool ok = await generateStepVideo(i);
-                          if (!ok) {
-                            Navigator.pop(context);
-                            return;
-                          }+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                          concatList = concatList +
-                              'file ${tempDirPath}/video_${i.toString()}.mp4\n';
-                        }
-                        final File concatFile =
-                            await File("${tempDirPath}/concat.txt")
-                                .writeAsString(concatList);
-                        final String concatedVideo = "${tempDirPath}/video.mp4";
-                        final String concatCommand =
-                            '-y -f concat -safe 0 -i "${tempDirPath}/concat.txt" -c copy "${concatedVideo}"';
-                        await executeFFmpeg(concatCommand);
-                        models.FileList fileList = await listStorageFiles(
-                            bucketId: artTheopyAIRvideosRef.path);
-                        String fileId = '';
-                        for (int i = 0; i < fileList.files.length; i++) {
-                          if ((fileList.files[i].$id).contains(
-                              sessions![currentSessionIndex]
-                                  .reference!
-                                  .path!)) {
-                            fileId = fileList.files[i].$id;
-                            break;
-                          }
-                        }
-                        if (fileId.length > 0) {
-                          await deleteStorageFile(
-                              bucketId: artTheopyAIRvideosRef.path,
-                              fileId: fileId);
-                        }
-                        // getAppDirListing();
-                        int len = await File(concatedVideo).length();
-                        var response = await storeStorageFile(
-                          bucketId: artTheopyAIRvideosRef.path!,
-                          storageFileId: generateVideoStorageFilename(
-                            session,
-                          ),
-                          localFilePath: concatedVideo,
-                        );
+                        // currentSession = session;
+                        currentSessionIndex = sessionIndex;
+                        currentTherapist =
+                            await getUser(document: session.therapistId);
+                        currentClient =
+                            await getUser(document: session.clientId);
                         await updateDocument(
                             collection: sessionsRef,
                             document: sessions![currentSessionIndex].reference,
                             data: {
-                              kSessionSessionModified: false,
-                              kSessionVideoCreated: true
+                              kSessionSessionModified: true,
                             });
-                        setState(() {
-                          sessions![currentSessionIndex].videoCreated = true;
-                          sessions![currentSessionIndex].sessionModified =
-                              false;
-                        });
+
+                        // print('(S1C)${session.clientId}');
+                        if (currentUser!.archiveSessions ?? false) {
+                          await restoreAIRFromCloud(sessionIndex);
+                        }
+                        Navigator.push(
+                            context,
+                            PageTransition(
+                              type: kStandardPageTransitionType,
+                              duration: kStandardTransitionTime,
+                              reverseDuration: kStandardReverseTransitionTime,
+                              child: SessionStepDisplayWidget(),
+                            )).then((_) => setState(() {}));
+                      },
+                    ),
+                  ]),
+                  SizedBox(height: kIconButtonGap),
+                  FlutterFlowIconButton(
+                      // showLoadingIndicator: true
+                      caption: ((session.videoCreated!) &&
+                              (!session.sessionModified!))
+                          ? 'Video available'
+                          : 'Make video',
+                      tooltipMessage: 'Speech to text',
+                      borderColor: Colors.transparent,
+                      borderRadius: 0.0,
+                      borderWidth: 1.0,
+                      buttonSize: 40.0,
+                      buttonWidth: kSessionIconButtonWidth,
+                      icon: Icon(Icons.movie),
+                      onPressed: () async {
+                        await listSessionStepList(thisSessionIndex: sessionIndex);
+                        failureMessage = '';
+                        await makeVideo(
+                            context: context,
+                            externalSetState: setState,
+                            index: sessionIndex,
+                            sessionIndex: sessionIndex,
+                            session: session,
+                            setState: setState,
+                            totalSteps: sessions![sessionIndex].totalSteps);
                         Navigator.pop(context);
-                      },*/
-              ),
-              SizedBox(height: kIconButtonGap),
-              FlutterFlowIconButton(
-                  showLoadingIndicator: true,
-                  caption: (sessions![index].videoCreated!)
-                      ? 'Load video'
-                      : 'Video not available',
-                  tooltipMessage: 'Load video',
-                  borderColor: Colors.transparent,
-                  borderRadius: 0.0,
-                  borderWidth: 1.0,
-                  buttonSize: 40.0,
-                  buttonWidth: kSessionIconButtonWidth,
-                  icon: (sessions![index].videoController == null)
-                      ? Icon(Icons.local_movies)
-                      : (sessions![index].videoController!.value.isPlaying
-                          ? Icon(Icons.pause)
-                          : Icon(Icons.slow_motion_video)),
-                  onPressed: /*(!session.videoCreated!) ? null :*/
-                      () async {
-                    print(
-                        '(VA203A)${index},,,,${sessions![index].videoController}');
-                    await loadVideo(index);
-                    print(
-                        '(VA203B)${index},,,,${sessions![index].videoController}');
-                    showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(builder: (context, setState) {
-                            return AlertDialog(
-                              title: Text('Video'),
-                              content: Container(
-                                width: 400,
-                                height: 400,
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        width: 1, color: Colors.black)),
-                                child: sessions![currentSessionIndex]
-                                        .videoController!
-                                        .value
-                                        .isInitialized
-                                    ? AspectRatio(
-                                        aspectRatio:
-                                            sessions![currentSessionIndex]
-                                                .videoController!
-                                                .value
-                                                .aspectRatio,
-                                        child: VideoPlayer(
-                                            sessions![currentSessionIndex]
-                                                .videoController!),
-                                      )
-                                    : Container(color: Colors.amber),
+                      }
+                      /*((sessions![index].videoCreated!) &&
+                            (!session.sessionModified!))
+                        ? null
+                        : () async {
+                            currentSessionIndex = index;
+                            // showAlertDialog(context);
+                            sessionStepsList = await listSessionStepList(
+                                thisSession: sessions![index]);
+                            await emptyTempDirOFPhotosVideosConcat();
+                            _utf8Encoder = utf8.encoder;
+                            dir = Directory.fromRawPath(
+                                _utf8Encoder!.convert(tempDirPath!));
+                            String concatList = '';
+                            for (int i = 0; i < sessionStepsList!.length; i++) {
+                              bool ok = await generateStepVideo(i);
+                              if (!ok) {
+                                Navigator.pop(context);
+                                return;
+                              }+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                              concatList = concatList +
+                                  'file ${tempDirPath}/video_${i.toString()}.mp4\n';
+                            }
+                            final File concatFile =
+                                await File("${tempDirPath}/concat.txt")
+                                    .writeAsString(concatList);
+                            final String concatedVideo = "${tempDirPath}/video.mp4";
+                            final String concatCommand =
+                                '-y -f concat -safe 0 -i "${tempDirPath}/concat.txt" -c copy "${concatedVideo}"';
+                            await executeFFmpeg(concatCommand);
+                            models.FileList fileList = await listStorageFiles(
+                                bucketId: artTheopyAIRvideosRef.path);
+                            String fileId = '';
+                            for (int i = 0; i < fileList.files.length; i++) {
+                              if ((fileList.files[i].$id).contains(
+                                  sessions![currentSessionIndex]
+                                      .reference!
+                                      .path!)) {
+                                fileId = fileList.files[i].$id;
+                                break;
+                              }
+                            }
+                            if (fileId.length > 0) {
+                              await deleteStorageFile(
+                                  bucketId: artTheopyAIRvideosRef.path,
+                                  fileId: fileId);
+                            }
+                            // getAppDirListing();
+                            int len = await File(concatedVideo).length();
+                            var response = await storeStorageFile(
+                              bucketId: artTheopyAIRvideosRef.path!,
+                              storageFileId: generateVideoStorageFilename(
+                                session,
                               ),
-                              actions: [
-                                FlutterFlowIconButton(
-                                  showLoadingIndicator: true,
-                                  caption: (sessions![index].videoCreated!)
-                                      ? 'Play video'
-                                      : 'Video not available',
-                                  tooltipMessage: 'Load video',
-                                  borderColor: Colors.transparent,
-                                  borderRadius: 0.0,
-                                  borderWidth: 1.0,
-                                  buttonSize: 40.0,
-                                  buttonWidth: kSessionIconButtonWidth,
-                                  icon:
-                                      (sessions![index].videoController == null)
+                              localFilePath: concatedVideo,
+                            );
+                            await updateDocument(
+                                collection: sessionsRef,
+                                document: sessions![currentSessionIndex].reference,
+                                data: {
+                                  kSessionSessionModified: false,
+                                  kSessionVideoCreated: true
+                                });
+                            setState(() {
+                              sessions![currentSessionIndex].videoCreated = true;
+                              sessions![currentSessionIndex].sessionModified =
+                                  false;
+                            });
+                            Navigator.pop(context);
+                          },*/
+                      ),
+                  SizedBox(height: kIconButtonGap),
+                  FlutterFlowIconButton(
+                      showLoadingIndicator: true,
+                      caption: (sessions![sessionIndex].videoCreated!)
+                          ? 'Load video'
+                          : 'Video not available',
+                      tooltipMessage: 'Load video',
+                      borderColor: Colors.transparent,
+                      borderRadius: 0.0,
+                      borderWidth: 1.0,
+                      buttonSize: 40.0,
+                      buttonWidth: kSessionIconButtonWidth,
+                      icon: (sessions![sessionIndex].videoController == null)
+                          ? Icon(Icons.local_movies)
+                          : (sessions![sessionIndex]
+                                  .videoController!
+                                  .value
+                                  .isPlaying
+                              ? Icon(Icons.pause)
+                              : Icon(Icons.slow_motion_video)),
+                      onPressed: /*(!session.videoCreated!) ? null :*/
+                          () async {
+                        print(
+                            '(VA203A)${sessionIndex},,,,${sessions![sessionIndex].videoController}');
+                        await loadVideo(sessionIndex);
+                        print(
+                            '(VA203B)${sessionIndex},,,,${sessions![sessionIndex].videoController}');
+                        showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                return AlertDialog(
+                                  title: Text('Video'),
+                                  content: Container(
+                                    width: 400,
+                                    height: 400,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 1, color: Colors.black)),
+                                    child: sessions![currentSessionIndex]
+                                            .videoController!
+                                            .value
+                                            .isInitialized
+                                        ? AspectRatio(
+                                            aspectRatio:
+                                                sessions![currentSessionIndex]
+                                                    .videoController!
+                                                    .value
+                                                    .aspectRatio,
+                                            child: VideoPlayer(
+                                                sessions![currentSessionIndex]
+                                                    .videoController!),
+                                          )
+                                        : Container(color: Colors.amber),
+                                  ),
+                                  actions: [
+                                    FlutterFlowIconButton(
+                                      showLoadingIndicator: true,
+                                      caption: (sessions![sessionIndex]
+                                              .videoCreated!)
+                                          ? 'Play video'
+                                          : 'Video not available',
+                                      tooltipMessage: 'Load video',
+                                      borderColor: Colors.transparent,
+                                      borderRadius: 0.0,
+                                      borderWidth: 1.0,
+                                      buttonSize: 40.0,
+                                      buttonWidth: kSessionIconButtonWidth,
+                                      icon: (sessions![sessionIndex]
+                                                  .videoController ==
+                                              null)
                                           ? Icon(Icons.local_movies)
-                                          : (sessions![index]
+                                          : (sessions![sessionIndex]
                                                   .videoController!
                                                   .value
                                                   .isPlaying
                                               ? Icon(Icons.pause)
                                               : Icon(Icons.play_arrow)),
-                                  onPressed: /*(!session.videoCreated!) ? null :*/
-                                      () async {
-                                    sessions![currentSessionIndex]
-                                        .videoController!
-                                        .play();
-                                  },
-                                ),
-                              ],
-                            );
-                          });
-                        });
-                  }),
-              SizedBox(height: kIconButtonGap),
-              FlutterFlowIconButton(
-                  showLoadingIndicator: true,
-                  caption: 'Send email',
-                  tooltipMessage: 'Send email with link to video',
-                  borderColor: Colors.transparent,
-                  borderRadius: 0.0,
-                  borderWidth: 1.0,
-                  buttonSize: 40.0,
-                  buttonWidth: kSessionIconButtonWidth,
-                  icon: Icon(Icons.email_outlined),
-                  onPressed: () async {
-                    // currentSession = session;
-                    currentSessionIndex = index;
-                    String videoURL = '';
-                    models.FileList fileList = await listStorageFiles(
-                        bucketId: artTheopyAIRvideosRef.path);
-                    bool videoAvailable = false;
-                    if (fileList.files.length > 0) {
-                      for (int i = 0; i < fileList.files.length; i++) {
-                        String fileId = fileList.files[i].$id;
-                        if ((fileId.contains('video')) &&
-                            (fileId.contains(sessions![currentSessionIndex]
-                                .reference!
-                                .path!))) {
-                          videoAvailable = true;
-                          final String BUCKET_ID = artTheopyAIRvideosRef.path!;
-                          final String FILE_ID = fileId;
-                          final String PROJECT_ID = kProjectID;
-                          if (FILE_ID.length > 0) {
-                            videoURL =
-                                'https://cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${FILE_ID}/view?project=${PROJECT_ID}';
+                                      onPressed: /*(!session.videoCreated!) ? null :*/
+                                          () async {
+                                        sessions![currentSessionIndex]
+                                            .videoController!
+                                            .play();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                            });
+                      }),
+                  SizedBox(height: kIconButtonGap),
+                  FlutterFlowIconButton(
+                      showLoadingIndicator: true,
+                      caption: 'Send email',
+                      tooltipMessage: 'Send email with link to video',
+                      borderColor: Colors.transparent,
+                      borderRadius: 0.0,
+                      borderWidth: 1.0,
+                      buttonSize: 40.0,
+                      buttonWidth: kSessionIconButtonWidth,
+                      icon: Icon(Icons.email_outlined),
+                      onPressed: () async {
+                        // currentSession = session;
+                        currentSessionIndex = sessionIndex;
+                        String videoURL = '';
+                        models.FileList fileList = await listStorageFiles(
+                            bucketId: artTheopyAIRvideosRef.path);
+                        bool videoAvailable = false;
+                        if (fileList.files.length > 0) {
+                          for (int i = 0; i < fileList.files.length; i++) {
+                            String fileId = fileList.files[i].$id;
+                            if ((fileId.contains('video')) &&
+                                (fileId.contains(sessions![currentSessionIndex]
+                                    .reference!
+                                    .path!))) {
+                              videoAvailable = true;
+                              final String BUCKET_ID =
+                                  artTheopyAIRvideosRef.path!;
+                              final String FILE_ID = fileId;
+                              final String PROJECT_ID = kProjectID;
+                              if (FILE_ID.length > 0) {
+                                videoURL =
+                                    'https://cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${FILE_ID}/view?project=${PROJECT_ID}';
+                              }
+                            }
                           }
                         }
-                      }
-                    }
-                    print('(ES1)${videoURL}');
-                    BuildContext enclosingContext = context;
-                    showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(builder: (context, setState) {
-                            return AlertDialog(
-                              title: Text('Send Email'),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  videoAvailable
-                                      ? Text(
-                                          'Send Email with link to the created Video?')
-                                      : Text('No video avialable')
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                  child: const Text('Cancel'),
-                                ),
-                                videoAvailable
-                                    ? TextButton(
-                                        onPressed: () async {
-                                          print(
-                                              '(ES2)${currentUser!.displayName}....${currentUser!.email!}====${videoURL}');
-                                          sendEmail(
-                                              context: enclosingContext,
-                                              emailType: EmailType.customBody,
-                                              senderDisplayName:
-                                                  currentUser!.displayName!,
-                                              senderEmail: currentUser!.email!,
-                                              receiverEmail:
-                                                  currentUser!.email!,
-                                              hyperbookName: '',
-                                              body:
-                                                  'Video available here: ${videoURL}');
-                                          context.pop();
-                                        },
-                                        child: const Text('Confirm'),
-                                      )
-                                    : Container(),
-                              ],
-                            );
-                          });
-                        });
-                  }),
-              SizedBox(height: kIconButtonGap),
-              FlutterFlowIconButton(
-                  showLoadingIndicator: true,
-                  caption: 'Archive',
-                  tooltipMessage: 'Archive functions',
-                  borderColor: Colors.transparent,
-                  borderRadius: 0.0,
-                  borderWidth: 1.0,
-                  buttonSize: 40.0,
-                  buttonWidth: kSessionIconButtonWidth,
-                  icon: Icon(Icons.archive),
-                  onPressed: () async {
-                    // currentSession = session;
-                    currentSessionIndex = index;
-                    String videoURL = '';
-                    models.FileList fileList = await listStorageFiles(
-                        bucketId: artTheopyAIRvideosRef.path);
-                    bool videoAvailable = false;
-                    if (fileList.files.length > 0) {
-                      for (int i = 0; i < fileList.files.length; i++) {
-                        String fileId = fileList.files[i].$id;
-                        if ((fileId.contains('video')) &&
-                            (fileId.contains(sessions![currentSessionIndex]
-                                .reference!
-                                .path!))) {
-                          videoAvailable = true;
-                          final String BUCKET_ID = artTheopyAIRvideosRef.path!;
-                          final String FILE_ID = fileId;
-                          final String PROJECT_ID = kProjectID;
-                          if (FILE_ID.length > 0) {
-                            videoURL =
-                                'https://cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${FILE_ID}/view?project=${PROJECT_ID}';
+                        print('(ES1)${videoURL}');
+                        BuildContext enclosingContext = context;
+                        showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                return AlertDialog(
+                                  title: Text('Send Email'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      videoAvailable
+                                          ? Text(
+                                              'Send Email with link to the created Video?')
+                                          : Text('No video avialable')
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        context.pop();
+                                      },
+                                      child: const Text('Cancel'),
+                                    ),
+                                    videoAvailable
+                                        ? TextButton(
+                                            onPressed: () async {
+                                              print(
+                                                  '(ES2)${currentUser!.displayName}....${currentUser!.email!}====${videoURL}');
+                                              sendEmail(
+                                                  context: enclosingContext,
+                                                  emailType:
+                                                      EmailType.customBody,
+                                                  senderDisplayName:
+                                                      currentUser!.displayName!,
+                                                  senderEmail:
+                                                      currentUser!.email!,
+                                                  receiverEmail:
+                                                      currentUser!.email!,
+                                                  hyperbookName: '',
+                                                  body:
+                                                      'Video available here: ${videoURL}');
+                                              context.pop();
+                                            },
+                                            child: const Text('Confirm'),
+                                          )
+                                        : Container(),
+                                  ],
+                                );
+                              });
+                            });
+                      }),
+                  SizedBox(height: kIconButtonGap),
+                  FlutterFlowIconButton(
+                      showLoadingIndicator: true,
+                      caption: 'Archive',
+                      tooltipMessage: 'Archive functions',
+                      borderColor: Colors.transparent,
+                      borderRadius: 0.0,
+                      borderWidth: 1.0,
+                      buttonSize: 40.0,
+                      buttonWidth: kSessionIconButtonWidth,
+                      icon: Icon(Icons.archive),
+                      onPressed: () async {
+                        // currentSession = session;
+                        currentSessionIndex = sessionIndex;
+                        String videoURL = '';
+                        models.FileList fileList = await listStorageFiles(
+                            bucketId: artTheopyAIRvideosRef.path);
+                        bool videoAvailable = false;
+                        if (fileList.files.length > 0) {
+                          for (int i = 0; i < fileList.files.length; i++) {
+                            String fileId = fileList.files[i].$id;
+                            if ((fileId.contains('video')) &&
+                                (fileId.contains(sessions![currentSessionIndex]
+                                    .reference!
+                                    .path!))) {
+                              videoAvailable = true;
+                              final String BUCKET_ID =
+                                  artTheopyAIRvideosRef.path!;
+                              final String FILE_ID = fileId;
+                              final String PROJECT_ID = kProjectID;
+                              if (FILE_ID.length > 0) {
+                                videoURL =
+                                    'https://cloud.appwrite.io/v1/storage/buckets/${BUCKET_ID}/files/${FILE_ID}/view?project=${PROJECT_ID}';
+                              }
+                            }
                           }
                         }
-                      }
-                    }
-                    print('(ES1)${videoURL}');
-                    BuildContext enclosingContext = context;
-                    showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return StatefulBuilder(builder: (context, setState) {
-                            return AlertDialog(
-                              title: Text('Archive Functions'),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  showCreateArchiveButton(index),
-                                  SizedBox(height: kIconButtonGap),
-                                  showArchiveRestoreButton(index),
-                                  SizedBox(height: kIconButtonGap),
-                                  showAIRDeleteButton(index),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                  child: const Text('Return'),
-                                ),
-                              ],
-                            );
-                          });
-                        });
-                  }),
+                        print('(ES1)${videoURL}');
+                        BuildContext enclosingContext = context;
+                        showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return StatefulBuilder(
+                                  builder: (context, setState) {
+                                return AlertDialog(
+                                  title: Text('Archive Functions'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      showCreateArchiveButton(sessionIndex),
+                                      SizedBox(height: kIconButtonGap),
+                                      showArchiveRestoreButton(sessionIndex),
+                                      SizedBox(height: kIconButtonGap),
+                                      showAIRDeleteButton(sessionIndex),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        context.pop();
+                                      },
+                                      child: const Text('Return'),
+                                    ),
+                                  ],
+                                );
+                              });
+                            });
+                      }),
 
-              /*        Container(
-                //color: Colors.amber,
-                child: SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.9,
-                  height: 155,
-                  child: FittedBox(
-                    alignment: Alignment.center,
-                    fit: BoxFit.cover,
+                  /*        Container(
+                    //color: Colors.amber,
                     child: SizedBox(
-                      height: (sessions![index].videoController == null)
-                          ? 100
-                          : sessions![index].videoController!.value.size.height,
-                      width: (sessions![index].videoController == null)
-                          ? 100
-                          : sessions![index].videoController!.value.size.width,
-                      child: (sessions![index].videoController == null)
-                          ? Container()
-                          : Container(),
+                      width: MediaQuery.sizeOf(context).width * 0.9,
+                      height: 155,
+                      child: FittedBox(
+                        alignment: Alignment.center,
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          height: (sessions![index].videoController == null)
+                              ? 100
+                              : sessions![index].videoController!.value.size.height,
+                          width: (sessions![index].videoController == null)
+                              ? 100
+                              : sessions![index].videoController!.value.size.width,
+                          child: (sessions![index].videoController == null)
+                              ? Container()
+                              : Container(),
+                        ),
+                      ),
                     ),
-                  ),
+                  ),*/
+                ]),
+            SizedBox(width: 20),
+            Container(
+              width: 110,
+              height: 220,
+              color: FlutterFlowTheme.of(context).primary.withAlpha(0X20),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(session.progressText1),
+                    Text(session.progressText2),
+                    Text(session.progressText3),
+                    (session.progressValue > 0.001)
+                        ? CircularProgressIndicator(
+                            value: session.progressValue)
+                        : Container(),
+                  ],
                 ),
-              ),*/
-            ]),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -1467,10 +1511,10 @@ void listCP() {
   }
 }
 
-Future<void> deleteAIR(SessionsRecord session) async {
+Future<void> deleteAIR(int sessionIndex) async {
   Utf8Encoder? utf8Encoder = utf8.encoder;
   List<SessionStepsRecord> sessionSteps =
-      await listSessionStepList(thisSession: session);
+      await listSessionStepList(thisSessionIndex: sessionIndex);
   utf8Encoder = utf8.encoder;
   Directory appDir = Directory.fromRawPath(utf8Encoder!.convert(appDirPath!));
   List<String> appDirPathList = await getAppDirListing();
@@ -1494,9 +1538,9 @@ Future<void> deleteAIR(SessionsRecord session) async {
 }
 
 Future<void> restoreAIRFromCloud(int? index) async {
-  SessionsRecord session = sessions![index ?? 0];
+  //SessionsRecord session = sessions![index ?? 0];
   List<SessionStepsRecord> sessionSteps =
-      await listSessionStepList(thisSession: session);
+      await listSessionStepList(thisSessionIndex: index?? 0);
   _utf8Encoder = utf8.encoder;
   List<String> appDirPathList = await getAppDirListing();
   for (int j = 0; j < sessionSteps.length; j++) {
@@ -1523,7 +1567,7 @@ Future<void> storeAIRInCloud(int index) async {
   print('(DA50A)');
   SessionsRecord session = sessions![index];
   List<SessionStepsRecord> sessionSteps =
-      await listSessionStepList(thisSession: session);
+      await listSessionStepList(thisSessionIndex: index);
   _utf8Encoder = utf8.encoder;
   List<String> appDirPathList =
       await getSessionStepAppDirListing(session.reference!.path!);

@@ -551,7 +551,7 @@ class _SessionStepDisplayWidgetState
     print('(SS5)${sessions![currentSessionIndex]!.clientDisplayName}');
 
     return FutureBuilder<List<SessionStepsRecord>>(
-      future: listSessionStepList(thisSession: sessions![currentSessionIndex]),
+      future: listSessionStepList(thisSessionIndex: currentSessionIndex),
       builder: (BuildContext context, snapshot) {
         if (!snapshot.hasData) {
           // while data is loading:
