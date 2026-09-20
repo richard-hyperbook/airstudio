@@ -279,6 +279,7 @@ class _SessionDisplayWidgetState
                           print('(DA23)');
                           //SessionsRecord session = sessions![index];
                           await deleteAIR(index);
+                          setState((){});
                           context.pop();
                         },
                         child: const Text('Confirm'),
@@ -884,7 +885,7 @@ class _SessionDisplayWidgetState
                     ),
                   ),*/
                 ]),
-            SizedBox(width: 20),
+           // SizedBox(width: 20),
             Container(
               width: 110,
               height: 220,
@@ -1530,10 +1531,12 @@ Future<void> deleteAIR(int sessionIndex) async {
         print('(DA4)${k}....${appDirPathList[k]}');
       }
     }
+
   }
   await deleteDocument(
       collection: sessionsRef,
       document: sessions![currentSessionIndex].reference);
+
   print('(DA5)${sessions![currentSessionIndex].reference!.path}');
 }
 

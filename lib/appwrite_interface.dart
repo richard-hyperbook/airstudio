@@ -553,7 +553,7 @@ Future<models.DocumentList> listDocuments({
       collectionId: collection.path!,
       queries: [
         Query.limit(kLimitDatabaseListDocuments),
-        Query.orderAsc(orderByAttribute),
+        Query.orderDesc(orderByAttribute),
       ],
     );
     print('(N11E)${docs}');

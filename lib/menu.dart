@@ -57,7 +57,7 @@ Widget insertMenu(
   return MenuAnchor(
     builder: (BuildContext context, MenuController controller, Widget? child) {
       return FlutterFlowIconButton(
-        enabled: (currentUser != null),
+        //enabled: (currentUser != null),
         fillColor: Colors.white,
         tooltipMessage: 'Menu',
         borderColor: (caption == null) ? FlutterFlowTheme.of(context).primary : Colors.transparent,
@@ -67,10 +67,14 @@ Widget insertMenu(
         buttonSize: height?? 40,
         caption: caption,
         onPressed: () {
-          if (controller.isOpen) {
-            controller.close();
+          if (currentUser != null) {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
           } else {
-            controller.open();
+            toast(context, 'Please login or create account', ToastKind.warning);
           }
         },
         icon: kIconMenu,

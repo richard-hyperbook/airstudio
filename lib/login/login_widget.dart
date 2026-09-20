@@ -789,7 +789,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                           // width: 40,
                                           // height: 40,
                                           child: FlutterFlowIconButton(
-                                            enabled: (currentUser != null),
+                                            //enabled: (currentUser != null),
                                             caption: 'Profile',
                                             fillColor: Colors.white,
                                             tooltipMessage: 'Change profile',
@@ -805,17 +805,21 @@ class _LoginWidgetState extends State<LoginWidget> {
                                             onPressed: () {
                                               // context.goNamedAuth('profilePage',
                                               //     context.mounted);
-                                              Navigator.push(
-                                                  context,
-                                                  PageTransition(
-                                                    type:
-                                                        kStandardPageTransitionType,
-                                                    duration:
-                                                        kStandardTransitionTime,
-                                                    reverseDuration:
-                                                        kStandardReverseTransitionTime,
-                                                    child: ProfilePageWidget(),
-                                                  ));
+                                              if (currentUser != null) {
+                                                Navigator.push(
+                                                    context,
+                                                    PageTransition(
+                                                      type:
+                                                      kStandardPageTransitionType,
+                                                      duration:
+                                                      kStandardTransitionTime,
+                                                      reverseDuration:
+                                                      kStandardReverseTransitionTime,
+                                                      child: ProfilePageWidget(),
+                                                    ));
+                                              } else {
+                                                toast(context, 'please login or create account', ToastKind.warning);
+                                              }
                                             },
                                           ),
                                         ),
