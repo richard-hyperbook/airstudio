@@ -235,7 +235,6 @@ bool resetPasswordCommandRecived = false;
 bool chapterHasBeenEdited = false;
 double logoSize = 100;
 
-
 const int kUserLevelNotLoggedIn = 0;
 const int kUserLevelFree = 1;
 const int kUserLevelPro = 2;
@@ -340,7 +339,6 @@ class SessionsRecord {
   double progressValue = 0;
   int totalSteps = 0;
 
-
   SessionsRecord({
     this.reference,
     this.clientId,
@@ -351,7 +349,7 @@ class SessionsRecord {
     required this.sessionModified,
     this.$createdAt,
     this.$updatedAt,
-  }){
+  }) {
     print('(FFM8A)${progressText1}....${progressValue}');
   }
 
@@ -1298,7 +1296,6 @@ Future<UsersRecord> getUser({DocumentReference? document}) async {
     cumulativeSessions: (row.data[kUserCumulativeSessions] as int?),
     // purchaseStatus: (row.data[kUserPurchaseStatus] as String?),
     archiveSessions: (row.data[kUserArchiveSessions] as bool?),
-
   );
   // print('(N2005)${u.email}');
   return u;
@@ -1444,10 +1441,10 @@ Future<int> getMaxVersionNumber({
 Future<List<SessionStepsRecord>> listSessionStepList({
   required int thisSessionIndex,
 }) async {
-
   models.DocumentList docs;
   SessionsRecord thisSession = sessions![thisSessionIndex];
-  print('(FFM9A)${sessionStepsRef.path}....${thisSessionIndex}++++${thisSession}');
+  print(
+      '(FFM9A)${sessionStepsRef.path}....${thisSessionIndex}++++${thisSession}');
   if (thisSession != null) {
     print('(FFM9B)${thisSessionIndex}');
     docs = await listDocumentsWithOneQueryDocumentReference(
@@ -1457,7 +1454,8 @@ Future<List<SessionStepsRecord>> listSessionStepList({
       orderByAttribute: kSessionStepIndex,
     );
     sessions![thisSessionIndex].totalSteps = docs.total;
-    print('(FFM9C)${thisSessionIndex}....${sessions![thisSessionIndex].totalSteps},,,,${docs.documents.length}');
+    print(
+        '(FFM9C)${thisSessionIndex}....${sessions![thisSessionIndex].totalSteps},,,,${docs.documents.length}');
   } else {
     docs = await listDocuments(
       collection: sessionsRef,
@@ -1486,7 +1484,8 @@ Future<List<SessionStepsRecord>> listSessionStepList({
     bool photoFileValid =
         await File(getFilePath(FileKind.photo, d.$id)).exists();
     bool audioFileValid = await File(getFilePath(FileKind.aac, d.$id)).exists();
-    print('(PE1)${appDirPath! + '/photo' + d.$id + '.jpg'}....${photoFileValid}');
+    print(
+        '(PE1)${appDirPath! + '/photo' + d.$id + '.jpg'}....${photoFileValid}');
 
     SessionStepsRecord h = SessionStepsRecord(
       reference: DocumentReference(path: d.$id),
@@ -1906,15 +1905,16 @@ Future<String?> storeStorageFile({
   print('(AU70A)${bucketId},,,,${storageFileId}...${localFilePath}');
   if (deleteIfNecessary) {
     // if (await doesStorageFileExist(bucketId: bucketId, fileId: storageFileId)) {
-      await deleteStorageFile(bucketId: bucketId, fileId: storageFileId);
-      print('(AU71)');
+    await deleteStorageFile(bucketId: bucketId, fileId: storageFileId);
+    print('(AU71)');
     // }
   }
   print('(AU70B)${bucketId},,,,${storageFileId}...${localFilePath}');
   models.File result = await storage.createFile(
     bucketId: bucketId!,
     fileId: storageFileId!,
-    file: InputFile.fromPath(path: localFilePath!,
+    file: InputFile.fromPath(
+      path: localFilePath!,
     ),
   );
   print('(AU70C)${result},,,,${result.name}...${result.$id}');
@@ -2137,7 +2137,7 @@ Future<void> printFontsDirListing() async {
 }
 
 Future<void> printAppDirListing() async {
- /* final utf8Encoder = utf8.encoder;
+  /* final utf8Encoder = utf8.encoder;
   var dir = Directory.fromRawPath(utf8Encoder.convert(appDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
     print('(AD2)${entity.path}');
@@ -2154,18 +2154,12 @@ Future<void> emptyAppDir() async {
   }
 }
 
-Future<void> emptyTempDirOFPhotosVideosConcat() async {
+Future<void> emptyTempDir() async {
   final utf8Encoder = utf8.encoder;
   var dir = Directory.fromRawPath(utf8Encoder.convert(tempDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
-    print('(TD9)${entity.path}');
-    if ((entity.path.contains('photo')) ||
-        (entity.path.contains('video')) ||
-        (entity.path.contains('question'))||
-        (entity.path.contains('concat'))) {
-      await entity.delete(recursive: true);
-      printTempDirListing();
-    }
+    await entity.delete(recursive: true);
+    printTempDirListing();
   }
 }
 
@@ -2317,7 +2311,7 @@ Future<bool> doesStorageFileExist({String? bucketId, String? fileId}) async {
       ],
     );
     print('(XY61A)${fileList.files.length}++++${fileId}');
-    for (var file in fileList.files){
+    for (var file in fileList.files) {
       print('(XY61B)${file.name}....${file.bucketId},,,,${file.signature}');
     }
   } catch (e) {
@@ -2443,11 +2437,11 @@ Future<void> logString(String s) async {
     kLogInfo: s,
   };
   print('(IAP30)${s}');
- models.Document doc = await createDocument(
-     collection: logRef,
-     data: d,
-     id: '',
-   );
+  models.Document doc = await createDocument(
+    collection: logRef,
+    data: d,
+    id: '',
+  );
   //print('(I1)${doc.$id}');
   // setState(() {
   /* log.add(Container(
