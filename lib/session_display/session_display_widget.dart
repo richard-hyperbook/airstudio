@@ -886,7 +886,7 @@ class _SessionDisplayWidgetState
                   ),*/
                 ]),
            // SizedBox(width: 20),
-            Container(
+/*            Container(
               width: 110,
               height: 220,
               color: FlutterFlowTheme.of(context).primary.withAlpha(0X20),
@@ -905,7 +905,7 @@ class _SessionDisplayWidgetState
                   ],
                 ),
               ),
-            )
+            )*/
           ],
         ),
       ),

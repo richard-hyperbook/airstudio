@@ -49,7 +49,7 @@ import 'package:ffmpeg_kit_flutter_new_video/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new_video/session.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permissionHandler;
-
+import 'package:path/path.dart';
 /*
 
 Future<void> handlePermission(permissionHandler.Permission permission, String name) async {
@@ -1913,9 +1913,10 @@ Future<String?> storeStorageFile({
   models.File result = await storage.createFile(
     bucketId: bucketId!,
     fileId: storageFileId!,
-    file: InputFile.fromPath(
-      path: localFilePath!,
-    ),
+    // file: InputFile.fromPath(
+    //   path: localFilePath!,
+    // ),
+      file: InputFile.fromPath(path: localFilePath!, filename: basename(localFilePath!)),
   );
   print('(AU70C)${result},,,,${result.name}...${result.$id}');
   var file = await storage.getFile(bucketId: bucketId, fileId: storageFileId);
@@ -2124,7 +2125,7 @@ Future<void> printTempDirListing() async {
   final utf8Encoder = utf8.encoder;
   var dir = Directory.fromRawPath(utf8Encoder.convert(tempDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
-    print('(TD2)${entity.path}');
+    print('(TD2)${entity.path}....${entity.statSync().size}');
   }
 }
 
@@ -2149,18 +2150,24 @@ Future<void> emptyAppDir() async {
   print('(AD9A)${appDirPath}');
   var dir = Directory.fromRawPath(utf8Encoder.convert(appDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
-    print('(AD9B)${entity.path}');
-    await entity.delete(recursive: false);
-  }
+
+      print('(AD9B)${entity.path}');
+      await entity.delete(recursive: false);
+    }
+
 }
 
 Future<void> emptyTempDir() async {
   final utf8Encoder = utf8.encoder;
   var dir = Directory.fromRawPath(utf8Encoder.convert(tempDirPath!));
   await for (var entity in dir.list(recursive: true, followLinks: false)) {
-    await entity.delete(recursive: true);
-    printTempDirListing();
+    print('(TD9A)${entity.path}');
+    if (entity.path.contains('AirStudio_')) {
+      print('(TD9B)${entity.path}');
+      await entity.delete(recursive: true);
+    }
   }
+  print('(TD9B)');
 }
 
 Future<List<String>> getAppDirListing() async {

@@ -61,14 +61,30 @@ a_N.wav = converted recorded audio
 vap_N.mp4 = video of photo + audio (audio length)
 vs_N.mp4 = very short clib of start of vap_N.mp4
 vq_N.mp4 = question text (silent video)
-vsqap_N.mp4 = concanated short, question, narrated photo
+vsqap_N.mp4 = concatenated short, question, narrated photo
+c_N.txt = concatenated text file
 
-video.mp4 = concatanted video of all steps
+Total files:
+concat.txt = final concatenated text file
+video.mp4 = final video file
+
+Substeps:
+0: Audio convert
+1: Photo + Audio video create
+2: Make short video
+3: Make question video
+4: Concatenate step videos
+5: Make final video
+6: Complete
+
 */
+const finalSubstep = 5;
+const isComplete = 5;
 List<SessionStepsRecord>? sessionStepsList;
 Utf8Encoder? utf8Encoder;
 // String? tempDirPath;
 const maxSessionsPerUser = 500;
+const int totalSubsteps = 5;
 
 Directory? dir;
 
@@ -84,10 +100,12 @@ void showProgress({
   required String message3,
   required double progressValue,
   required bool isError,
-}) {
-  //externalSetState!(() {
+}) async {
+  //externalSetState!(() {`
 
   if (isError) {
+    print('(FFM8Z)');
+    await printTempDirListing();
     showDialog<bool>(
         context: context!,
         builder: (BuildContext context) {
@@ -120,7 +138,7 @@ void showProgress({
   sessions![sessionIndex].progressText2 = message2;
   sessions![sessionIndex].progressText3 = message3;
   sessions![sessionIndex].progressValue = progressValue;
-  print('(FFM8)${message1}....${progressValue}');
+  // print('(FFM8)${message1}....${progressValue}');
   //});
 }
 
@@ -131,16 +149,18 @@ Future<void> ffmpegCommand(
     required int? step,
     required String? operation,
     required int sessionIndex,
-    required int totalSteps}) async {
+    required int totalSteps,
+    required int substep}) async {
   String logString = 'Logs will appear here...';
+  failureMessage = '';
   Session ffmpegSession = await FFmpegKit.execute(command!);
-  print('(FFM1)${command}');
+  // print('(FFM1)${command}');
 
   final output = await ffmpegSession.getOutput();
   final returnCode = await ffmpegSession.getReturnCode();
   final duration = await ffmpegSession.getDuration();
-  print(
-      '(FFM2)${returnCode!.toString()}....${returnCode.getValue()},,,,${output!.length}----${output.characters.length}>>>>${duration}');
+  // print(
+  //     '(FFM2)${returnCode!.toString()}....${returnCode.getValue()},,,,${output!.length}----${output.characters.length}>>>>${duration}');
   //  setState(() {
   logString += '\n✅ Processing completed!\n';
   logString += 'Return code: $returnCode\n';
@@ -150,21 +170,29 @@ Future<void> ffmpegCommand(
   //});
   debugPrint('(FFM3)$output');
   print('(FFM4)${step},,,,${totalSteps}++++${returnCode}^^^^${logString}....');
-  if (returnCode.getValue() != 0) {
+  if ((returnCode!.getValue()) != 0) {
     failureMessage = 'Error: Q${step! + 1}, ${output}';
-    print('(M1)${returnCode.getValue()}....${failureMessage}');
   }
+  print('(FFME1)${returnCode.getValue()}....${step}.${substep}>>>>${command}++++${failureMessage}');
+  String message = 'Question: ${((step!) + 1).toString()}.${substep.toString()}';
+  if (substep == finalSubstep){
+    message = 'Final processing';
+  } else {
+    if (message == isComplete){
+      message = 'Completed';
+    }
+  }
+
   showProgress(
       context: context,
       externalSetState: externalSetState,
       sessionIndex: sessionIndex,
-      message1: (failureMessage == '')
-          ? 'Question: ${((step!) + 1).toString()}'
-          : failureMessage,
+      message1: message,
       message2: operation!,
       message3: returnCode.toString(),
-      progressValue: step! / (totalSteps - 1),
-      isError: (failureMessage != ''));
+      progressValue: (step + (substep / totalSubsteps)) / (totalSteps),
+      isError: false//(failureMessage != '')
+        );
 }
 
 Future<bool> generateStepVideo(
@@ -177,19 +205,24 @@ Future<bool> generateStepVideo(
   SessionStepsRecord sessionStep = sessionStepsList![step];
   currentSessionStep = sessionStepsList![step];
   //sessionStepIndex = step;
+  final String tempPhotoPath =
+      '${tempDirPath}/AirStudio_p_${(step).toString()}.jpg';
+  final String tempVideoPath =
+      '${tempDirPath}/AirStudio_vap_${(step).toString()}.mp4';
+  final String tempShortVideoPath =
+      '${tempDirPath}/AirStudio_vs_${(step).toString()}.mp4';
+  final String audioPath =
+  getFilePath(FileKind.aac, sessionStepsList![step].reference!.path!);
+  final String tempQuestionVideoPath =
+      '${tempDirPath}/AirStudio_vq_${(step).toString()}.mp4';
+  final String tempConcatTextPath =
+      '${tempDirPath}/AirStudio_c_${(step).toString()}.txt';
+  final String concatedVideo = "${tempDirPath}/AirStudio_vsqap_${step}.mp4";
+
   print('(VA10)${currentSessionStep!.reference!.path}....${step}');
   if (true /*(currentSessionStep!.audio!.path ?? '').length > 0*/) {
     if (true /*(currentSessionStep!.audio!.path ?? '').length > 0*/) {
-      final String tempPhotoPath =
-          '${tempDirPath}/p_${(step).toString()}.jpg';
-      final String tempVideoPath =
-          '${tempDirPath}/vap_${(step).toString()}.mp4';
-      final String tempShortVideoPath =
-          '${tempDirPath}/vs_${(step).toString()}.mp4';
-
       // print('(VA11)${tempPhotoPath}....${tempVideoPath}');
-      String audioPath =
-          getFilePath(FileKind.aac, sessionStepsList![step].reference!.path!);
       String tempAudioPath = '${tempDirPath}/a_${(step).toString()}.wav';
       final String audioConvertCommand =
           '-y -i "${audioPath}" "${tempAudioPath}"';
@@ -201,6 +234,7 @@ Future<bool> generateStepVideo(
         step: step,
         operation: 'aac-wav',
         totalSteps: totalSteps,
+        substep: 0,
       );
 
       // print(
@@ -247,142 +281,7 @@ Future<bool> generateStepVideo(
         step: step,
         operation: 'aud+pho',
         totalSteps: totalSteps,
-      );
-
-      if (step == 0) {
-        final String shortCommand =
-            '-ss 0 -i "${tempVideoPath}" -t 0.1 -map 0 -c copy "${tempShortVideoPath}"';
-        // print('(VA17)${command}');
-        await ffmpegCommand(
-          context: context,
-          externalSetState: externalSetState,
-          command: shortCommand,
-          sessionIndex: sessionIndex,
-          step: step,
-          operation: 'short',
-          totalSteps: totalSteps,
-        );
-      }
-
-      final String questionText = sessionStep.question!;
-      const maxCharsQuestionLine = 20;
-      String formatedQuestionText = '';
-      if (questionText.length < maxCharsQuestionLine) {
-        formatedQuestionText = formatedQuestionText;
-      } else {
-        List<String> questionSplit = questionText.split(' ');
-        int charCount = 0;
-        for (int i = 0; i < questionSplit.length; i++) {
-          formatedQuestionText = formatedQuestionText + ' ' + questionSplit[i];
-          charCount = charCount + questionSplit[i].length + 1;
-          if (charCount > maxCharsQuestionLine) {
-            formatedQuestionText = formatedQuestionText + '\n';
-            charCount = 0;
-          }
-        }
-      }
-      print('(VC5A)${questionText}....${formatedQuestionText}');
-      final String questionVideoCommand =
-          '''-f lavfi -i color=size=500x500:duration=2:rate=30:color=black -vf "drawtext=fontfile=/system/fonts/DroidSans.ttf:fontsize=30:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:text='${formatedQuestionText}'" -pix_fmt yuv420p ${tempDirPath}/question_${step.toString()}.mp4''';
-      await ffmpegCommand(
-        context: context,
-        externalSetState: externalSetState,
-        command: questionVideoCommand,
-        sessionIndex: sessionIndex,
-        step: step,
-        operation: 'question',
-        totalSteps: totalSteps,
-      );
-      String videoStorageId =
-          generateVideoStorageFilename(sessions![currentSessionIndex]);
-      // print('(VA21)${videoStorageId},,,,${tempVideoPath}++++${questionText}');
-    }
-  }
-  return true;
-}
-
-Future<bool> generateStepVideo2(
-    {required BuildContext? context,
-    required Function? externalSetState,
-    required int sessionIndex,
-    int step = 0,
-    SessionsRecord? session,
-    required int totalSteps}) async {
-  SessionStepsRecord sessionStep = sessionStepsList![step];
-  currentSessionStep = sessionStepsList![step];
-  //sessionStepIndex = step;
-  print('(VA10)${currentSessionStep!.reference!.path}....${step}');
-  if (true /*(currentSessionStep!.audio!.path ?? '').length > 0*/) {
-    if (true /*(currentSessionStep!.audio!.path ?? '').length > 0*/) {
-      final String tempPhotoPath =
-          '${tempDirPath}/photo2_${(step).toString()}.jpg';
-      final String questionImagePath =
-          '${tempDirPath}/question2_${(step).toString()}.jpg';
-      final String tempVideoPath =
-          '${tempDirPath}/video2_${(step).toString()}.mp4';
-      final String tempShortVideoPath =
-          '${tempDirPath}/shortvideo2_${(step).toString()}.mp4';
-
-      // print('(VA11)${tempPhotoPath}....${tempVideoPath}');
-      String audioPath =
-          getFilePath(FileKind.aac, sessionStepsList![step].reference!.path!);
-      String tempAudioPath = '${tempDirPath}/audio2_${(step).toString()}.wav';
-      final String audioConvertCommand =
-          '-y -i "${audioPath}" "${tempAudioPath}"';
-      await ffmpegCommand(
-        context: context,
-        externalSetState: externalSetState,
-        command: audioConvertCommand,
-        sessionIndex: sessionIndex,
-        step: step,
-        operation: 'aac-wav',
-        totalSteps: totalSteps,
-      );
-
-      // print(
-      //     '(VA12)${step}~~~${audioPath}====${generateAudioStorageFilenameMp3(sessionStep)}');
-      // print(
-      //     '(VA13)${step}~~~~${generatePhotoStorageFilename(sessionStep)},,,,${tempPhotoPath}====');
-      String sourcePhotoFilePath =
-          getFilePath(FileKind.photo, sessionStepsList![step].reference!.path!);
-      if (!(await isFileInAppDir(sourcePhotoFilePath))) {
-        if (lastPhotoPath == '') {
-          toast(context!, 'Photo missing from Step ${step.toString()}',
-              ToastKind.error);
-          print('(VA14A)');
-          return false;
-        } else {
-          sourcePhotoFilePath = lastPhotoPath;
-        }
-      } else {
-        lastPhotoPath = sourcePhotoFilePath;
-      }
-      superImage.Image? image =
-          superImage.decodeImage(File(sourcePhotoFilePath).readAsBytesSync());
-      superImage.Image? resizedImage =
-          superImage.copyResize(image!, width: 500, height: 500);
-      File(tempPhotoPath).writeAsBytesSync(superImage.encodeJpg(resizedImage));
-      print('(VA14B)${resizedImage.frameType}');
-      Image modifiedImage = Image(
-        image: ResizeImage(
-          FileImage(File(tempPhotoPath)),
-          width: 500,
-          height: 500,
-        ),
-      );
-      // print('(VA15)${step},,,,${tempPhotoPath}++++${questionImagePath}<');
-      dir = Directory.fromRawPath(utf8Encoder!.convert(tempDirPath!));
-      final String command =
-          '-loop 1 -i "${tempPhotoPath}" -i "${tempAudioPath}" -shortest "${tempVideoPath}"';
-      // print('(VA17)${command}');
-      await ffmpegCommand(
-        context: context,
-        externalSetState: externalSetState,
-        command: command,
-        sessionIndex: sessionIndex,
-        step: step,
-        operation: 'aud+pho',
-        totalSteps: totalSteps,
+        substep: 1,
       );
 
       if (true) {
@@ -397,6 +296,7 @@ Future<bool> generateStepVideo2(
           step: step,
           operation: 'short',
           totalSteps: totalSteps,
+          substep: 2,
         );
       }
 
@@ -419,7 +319,7 @@ Future<bool> generateStepVideo2(
       }
       print('(VC5A)${questionText}....${formatedQuestionText}');
       final String questionVideoCommand =
-          '''-f lavfi -i color=size=500x500:duration=2:rate=30:color=black -vf "drawtext=fontfile=/system/fonts/DroidSans.ttf:fontsize=30:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:text='${formatedQuestionText}'" -pix_fmt yuv420p ${tempDirPath}/question2_${step.toString()}.mp4''';
+          '''-f lavfi -i color=size=500x500:duration=10:rate=30:color=black -vf "drawtext=fontfile=/system/fonts/DroidSans.ttf:fontsize=30:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:text='${formatedQuestionText}'" -pix_fmt yuv420p ${tempQuestionVideoPath}''';
       await ffmpegCommand(
         context: context,
         externalSetState: externalSetState,
@@ -428,6 +328,7 @@ Future<bool> generateStepVideo2(
         step: step,
         operation: 'question',
         totalSteps: totalSteps,
+        substep: 3,
       );
       String videoStorageId =
           generateVideoStorageFilename(sessions![currentSessionIndex]);
@@ -437,30 +338,28 @@ Future<bool> generateStepVideo2(
   String concatList = '';
 
   concatList =
-      concatList + "file '${tempDirPath}/shortvideo2_${step.toString()}.mp4'\n";
-
+      concatList + "file '${tempShortVideoPath}'\n";
   concatList =
-      concatList + "file '${tempDirPath}/question2_${step.toString()}.mp4'\n";
+      concatList + "file '${tempQuestionVideoPath}'\n";
   concatList =
-      concatList + "file '${tempDirPath}/video2_${step.toString()}.mp4'\n";
-
+      concatList + "file '${tempVideoPath}'\n";
   final File concatFile =
-      await File("${tempDirPath}/concat.txt").writeAsString(concatList);
-  String conatContents = await File("${tempDirPath}/concat.txt").readAsString();
-  print(
-      '(VA31)${concatList}....${tempDirPath}/concat.txt}++++${conatContents}');
-  final String concatedVideo = "${tempDirPath}/videoconcat2_${step}.mp4";
+      await File("${tempConcatTextPath}").writeAsString(concatList);
+  String conatContents = await File("${tempConcatTextPath}").readAsString();
+  // print(
+  //     '(VA31)${concatList}....${tempConcatTextPath}++++${conatContents}');
   final String concatCommand =
-      '-y -safe 0 -f concat -i ${tempDirPath}/concat.txt -c copy "${concatedVideo}"';
+      '-y -safe 0 -f concat -i ${tempConcatTextPath} -c copy "${concatedVideo}"';
 // print('(VA32)${concatedVideo}....${concatCommand}');
   await ffmpegCommand(
     context: context,
     externalSetState: externalSetState,
     command: concatCommand,
     sessionIndex: sessionIndex,
-    step: totalSteps,
+    step: step,
     operation: 'concat',
     totalSteps: totalSteps,
+    substep: 4,
   );
   models.FileList fileList =
       await listStorageFiles(bucketId: artTheopyAIRvideosRef.path);
@@ -477,7 +376,6 @@ Future<bool> generateStepVideo2(
     localFilePath: concatedVideo,
     deleteIfNecessary: true,
   );
-
   return true;
 }
 
@@ -526,7 +424,7 @@ Future<void> makeVideo(
       session: session,
       totalSteps: totalSteps,
     );*/
-    await generateStepVideo2(
+    await generateStepVideo(
       context: context,
       externalSetState: externalSetState,
       sessionIndex: sessionIndex,
@@ -534,23 +432,18 @@ Future<void> makeVideo(
       session: session,
       totalSteps: totalSteps,
     );
-    if (i == 0) {
-      concatList =
-          concatList + "file '${tempDirPath}/shortvideo_${i.toString()}.mp4'\n";
-    }
     concatList =
-        concatList + "file '${tempDirPath}/question_${i.toString()}.mp4'\n";
-    concatList =
-        concatList + "file '${tempDirPath}/video_${i.toString()}.mp4'\n";
+        concatList + "file '${tempDirPath}/AirStudio_vsqap_${i.toString()}.mp4'\n";
   }
   final File concatFile =
-      await File("${tempDirPath}/concat.txt").writeAsString(concatList);
-  String conatContents = await File("${tempDirPath}/concat.txt").readAsString();
+      await File("${tempDirPath}/AirStudio_concat.txt").writeAsString(concatList);
+  String conatContents = await File("${tempDirPath}/AirStudio_concat.txt").readAsString();
   print(
-      '(VA31)${concatList}....${tempDirPath}/concat.txt}++++${conatContents}');
-  final String concatedVideo = "${tempDirPath}/video.mp4";
+      '(VA31)${concatList}....${tempDirPath}/AirStudio_concat.txt}++++${conatContents}');
+  final String concatedVideo = "${tempDirPath}/AirStudio_video.mp4";
   final String concatCommand =
-      '-y -safe 0 -f concat -i ${tempDirPath}/concat.txt -c copy "${concatedVideo}"';
+      '-y -safe 0 -f concat -i ${tempDirPath}/AirStudio_concat.txt -c copy "${concatedVideo}"';
+
   // print('(VA32)${concatedVideo}....${concatCommand}');
   await ffmpegCommand(
     context: context,
@@ -560,7 +453,9 @@ Future<void> makeVideo(
     step: totalSteps,
     operation: 'concat',
     totalSteps: totalSteps,
+    substep: finalSubstep,
   );
+  printTempDirListing();
   models.FileList fileList =
       await listStorageFiles(bucketId: artTheopyAIRvideosRef.path);
   String fileId = '';
@@ -575,7 +470,7 @@ Future<void> makeVideo(
     storageFileId: generateVideoStorageFilename(
       session,
     ),
-    localFilePath: concatedVideo,
+    localFilePath:     concatedVideo,
     deleteIfNecessary: true,
   );
   // print(
@@ -584,7 +479,14 @@ Future<void> makeVideo(
       collection: sessionsRef,
       document: sessions![currentSessionIndex].reference,
       data: {kSessionSessionModified: false, kSessionVideoCreated: true});
-  await progressDialog!.hide();
+  //await progressDialog!.hide();
+  showProgress(context: context,
+      externalSetState: externalSetState,
+      sessionIndex: 0,
+      message1: 'Complete',
+      message2: '',
+      message3: '',
+      progressValue: 1.0, isError: false);
   setState!(() {
     sessions![currentSessionIndex].videoCreated = true;
     sessions![currentSessionIndex].sessionModified = false;
