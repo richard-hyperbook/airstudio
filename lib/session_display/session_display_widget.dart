@@ -210,8 +210,8 @@ class _SessionDisplayWidgetState
   Future<void> loadVideo(int index) async {
     currentSessionIndex = index;
     final String videoStorageId =
-        'video${sessions![currentSessionIndex].reference!.path}.mp4';
-    final String videoPlayPath = '${tempDirPath}/video.mp4';
+        'video${sessions![currentSessionIndex].reference!.path}.${videoSuffix}';
+    final String videoPlayPath = '${tempDirPath}/video.${videoSuffix}';
     print('(VA200)${videoStorageId}....${videoPlayPath}');
     bool okVideo = await copySessionStepStorageFiletoLocal(
       bucketId: artTheopyAIRvideosRef.path,

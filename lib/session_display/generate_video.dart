@@ -35,13 +35,13 @@ import '../../login/login_widget.dart';
 //import '../../paypal/paypal_widget.dart';
 import '../../session_step_display/session_step_display_widget.dart';
 import '../../templates_page/templates_page_widget.dart';
-import 'package:ffmpeg_kit_flutter_new_video/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_video/session.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/session.dart';
 // import '../../platform/audio_recorder_platform.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:io';
 import 'dart:convert';
-import 'package:ffmpeg_kit_flutter_new_video/return_code.dart';
+import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:image/image.dart' as image2;
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -85,6 +85,7 @@ Utf8Encoder? utf8Encoder;
 // String? tempDirPath;
 const maxSessionsPerUser = 500;
 const int totalSubsteps = 5;
+
 
 Directory? dir;
 
@@ -154,13 +155,13 @@ Future<void> ffmpegCommand(
   String logString = 'Logs will appear here...';
   failureMessage = '';
   Session ffmpegSession = await FFmpegKit.execute(command!);
-  // print('(FFM1)${command}');
+  print('(FFM1)${command}');
 
   final output = await ffmpegSession.getOutput();
   final returnCode = await ffmpegSession.getReturnCode();
   final duration = await ffmpegSession.getDuration();
-  // print(
-  //     '(FFM2)${returnCode!.toString()}....${returnCode.getValue()},,,,${output!.length}----${output.characters.length}>>>>${duration}');
+  print(
+       '(FFM2)${returnCode!.toString()}....${returnCode.getValue()},,,,${output!.length}----${output.characters.length}>>>>${duration}');
   //  setState(() {
   logString += '\n✅ Processing completed!\n';
   logString += 'Return code: $returnCode\n';
@@ -208,16 +209,16 @@ Future<bool> generateStepVideo(
   final String tempPhotoPath =
       '${tempDirPath}/AirStudio_p_${(step).toString()}.jpg';
   final String tempVideoPath =
-      '${tempDirPath}/AirStudio_vap_${(step).toString()}.mp4';
+      '${tempDirPath}/AirStudio_vap_${(step).toString()}.${videoSuffix}';
   final String tempShortVideoPath =
-      '${tempDirPath}/AirStudio_vs_${(step).toString()}.mp4';
+      '${tempDirPath}/AirStudio_vs_${(step).toString()}.${videoSuffix}';
   final String audioPath =
   getFilePath(FileKind.aac, sessionStepsList![step].reference!.path!);
   final String tempQuestionVideoPath =
-      '${tempDirPath}/AirStudio_vq_${(step).toString()}.mp4';
+      '${tempDirPath}/AirStudio_vq_${(step).toString()}.${videoSuffix}';
   final String tempConcatTextPath =
       '${tempDirPath}/AirStudio_c_${(step).toString()}.txt';
-  final String concatedVideo = "${tempDirPath}/AirStudio_vsqap_${step}.mp4";
+  final String concatedVideo = "${tempDirPath}/AirStudio_vsqap_${step}.${videoSuffix}";
 
   print('(VA10)${currentSessionStep!.reference!.path}....${step}');
   if (true /*(currentSessionStep!.audio!.path ?? '').length > 0*/) {
@@ -270,8 +271,9 @@ Future<bool> generateStepVideo(
       );
       // print('(VA15)${step},,,,${tempPhotoPath}++++${questionImagePath}<');
       dir = Directory.fromRawPath(utf8Encoder!.convert(tempDirPath!));
+      final String videoParameters = '-c:v h264';
       final String command =
-          '-loop 1 -i "${tempPhotoPath}" -i "${tempAudioPath}" -shortest "${tempVideoPath}"';
+          '-loop 1 -i "${tempPhotoPath}" ${videoParameters} -i "${tempAudioPath}" -shortest "${tempVideoPath}"';
       // print('(VA17)${command}');
       await ffmpegCommand(
         context: context,
@@ -286,7 +288,7 @@ Future<bool> generateStepVideo(
 
       if (true) {
         final String shortCommand =
-            '-ss 0 -i "${tempVideoPath}" -t 0.1 -map 0 -c copy "${tempShortVideoPath}"';
+            '-ss 0 -i "${tempVideoPath}" -t 0.01 -map 0 -c copy "${tempShortVideoPath}"';
         // print('(VA17)${command}');
         await ffmpegCommand(
           context: context,
@@ -346,11 +348,12 @@ Future<bool> generateStepVideo(
   final File concatFile =
       await File("${tempConcatTextPath}").writeAsString(concatList);
   String conatContents = await File("${tempConcatTextPath}").readAsString();
-  // print(
-  //     '(VA31)${concatList}....${tempConcatTextPath}++++${conatContents}');
+  print(
+       '(VA31A)${concatList}....${tempConcatTextPath}++++${conatContents}');
   final String concatCommand =
       '-y -safe 0 -f concat -i ${tempConcatTextPath} -c copy "${concatedVideo}"';
-// print('(VA32)${concatedVideo}....${concatCommand}');
+ print('(VA32A)${concatedVideo}....${concatCommand}');
+ // await printTempDirListing();
   await ffmpegCommand(
     context: context,
     externalSetState: externalSetState,
@@ -372,7 +375,7 @@ Future<bool> generateStepVideo(
   print('(VA36B)${concatedVideo}....${generateVideoStorageFilename(session!)}');
   var response = await storeStorageFile(
     bucketId: artTheopyAIRvideosRef.path!,
-    storageFileId: 'vid${step}.mp4',
+    storageFileId: 'vid${step}.${videoSuffix}',
     localFilePath: concatedVideo,
     deleteIfNecessary: true,
   );
@@ -387,6 +390,12 @@ Future<void> makeVideo(
     SessionsRecord? session,
     StateSetter? setState,
     required int totalSteps}) async {
+ final session2 = await FFmpegKit.execute('-codecs');
+  final logs2 = await session2.getAllLogs();
+  // final output2 = logs2.map((e) => e.getMessage()).join('\n');
+  for (var log2 in logs2) {
+    print('(FW1)${log2.getMessage()}');
+  }
   // print(
   //     '(FW1)${index}....${sessions![index].videoCreated},,,,${!session!.sessionModified!}++++${((sessions![index].videoCreated!) && (!session!.sessionModified!))}~~~~${session.reference}');
   // print('(FW2)${index}');
@@ -433,14 +442,14 @@ Future<void> makeVideo(
       totalSteps: totalSteps,
     );
     concatList =
-        concatList + "file '${tempDirPath}/AirStudio_vsqap_${i.toString()}.mp4'\n";
+        concatList + "file '${tempDirPath}/AirStudio_vsqap_${i.toString()}.${videoSuffix}'\n";
   }
   final File concatFile =
       await File("${tempDirPath}/AirStudio_concat.txt").writeAsString(concatList);
   String conatContents = await File("${tempDirPath}/AirStudio_concat.txt").readAsString();
   print(
       '(VA31)${concatList}....${tempDirPath}/AirStudio_concat.txt}++++${conatContents}');
-  final String concatedVideo = "${tempDirPath}/AirStudio_video.mp4";
+  final String concatedVideo = "${tempDirPath}/AirStudio_video.${videoSuffix}";
   final String concatCommand =
       '-y -safe 0 -f concat -i ${tempDirPath}/AirStudio_concat.txt -c copy "${concatedVideo}"';
 

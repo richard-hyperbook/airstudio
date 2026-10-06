@@ -204,6 +204,7 @@ class _MyAppState extends State<MyApp> {
     } else {
       basicFontSize = 15;
     }
+    print('(TH1)');
     return MaterialApp.router(
       title: 'hyperbook',
       debugShowCheckedModeBanner: false,

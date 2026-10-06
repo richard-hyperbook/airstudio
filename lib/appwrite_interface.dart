@@ -45,8 +45,8 @@ import 'package:video_player/video_player.dart';
 // import '../platform/audio_recorder_platform.dart';
 
 // part 'appwrite_interface.g.dart';
-import 'package:ffmpeg_kit_flutter_new_video/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_video/session.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/session.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permissionHandler;
 import 'package:path/path.dart';
@@ -270,6 +270,7 @@ DocumentReference? get currentHyperbook => _currentHyperbook;
 set currentHyperbook(DocumentReference? value) {
   _currentHyperbook = value;
 }
+const String videoSuffix = 'mp4';
 
 class ConstraintsRecord {
   int? noOfHyperbooks;
@@ -1322,7 +1323,7 @@ String generatePhotoStorageFilename(
 String generateVideoStorageFilename(
   SessionsRecord session,
 ) {
-  return 'video${session.reference!.path}.mp4';
+  return 'video${session.reference!.path}.${videoSuffix}';
 }
 
 Future<List<SessionsRecord>> listSessionList({
@@ -1971,7 +1972,7 @@ String getFilePath(FileKind fileKind, String item) {
       break;
     case FileKind.video:
       prefix = 'video';
-      suffix = '.mp4';
+      suffix = '.${videoSuffix}';
       break;
     case FileKind.wav:
       prefix = 'wav';

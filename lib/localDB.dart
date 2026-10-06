@@ -155,7 +155,7 @@ const kAttrBackupChapterList = 'chapterList';
 
 const double kSessionStepCardHeight = 430;
 const double kIconButtonWidth = 180;
-const double kSessionIconButtonWidth = 180;
+const double kSessionIconButtonWidth = 200;
 const double kIconButtonHeight = 40;
 const double kIconButtonGap = 10;
 

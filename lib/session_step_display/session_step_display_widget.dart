@@ -47,7 +47,8 @@ import 'package:appwrite/enums.dart' as enums;
 // import 'package:compressor/compressor.dart';
 // import '/custom_code/widgets/audio_trimmer.dart';
 
-import 'package:ffmpeg_kit_flutter_new_video/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_new'
+    '/ffprobe_kit.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
