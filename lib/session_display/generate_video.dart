@@ -90,7 +90,7 @@ const int totalSubsteps = 5;
 Directory? dir;
 
 String lastPhotoPath = '';
-ProgressDialog? progressDialog;
+ProgressDialog? makeVideoProgressDialog;
 
 void showProgress({
   required BuildContext? context,
@@ -124,7 +124,7 @@ void showProgress({
                               fontWeight: FontWeight.w400)))));
         });
   } else {
-    progressDialog!.update(
+    makeVideoProgressDialog!.update(
       message: message1,
       progress: progressValue,
       progressWidget: Container(
@@ -271,7 +271,7 @@ Future<bool> generateStepVideo(
       );
       // print('(VA15)${step},,,,${tempPhotoPath}++++${questionImagePath}<');
       dir = Directory.fromRawPath(utf8Encoder!.convert(tempDirPath!));
-      final String videoParameters = '-c:v h264';
+      final String videoParameters = '-c:v h264 -r 25';
       final String command =
           '-loop 1 -i "${tempPhotoPath}" ${videoParameters} -i "${tempAudioPath}" -shortest "${tempVideoPath}"';
       // print('(VA17)${command}');
@@ -399,9 +399,9 @@ Future<void> makeVideo(
   // print(
   //     '(FW1)${index}....${sessions![index].videoCreated},,,,${!session!.sessionModified!}++++${((sessions![index].videoCreated!) && (!session!.sessionModified!))}~~~~${session.reference}');
   // print('(FW2)${index}');
-  progressDialog = ProgressDialog(context!,
+  makeVideoProgressDialog = ProgressDialog(context!,
       type: ProgressDialogType.normal, isDismissible: true, showLogs: true);
-  progressDialog!.style(
+  makeVideoProgressDialog!.style(
       message: 'Making video...',
       borderRadius: 10.0,
       backgroundColor: Colors.white,
@@ -414,7 +414,7 @@ Future<void> makeVideo(
           color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
       messageTextStyle: TextStyle(
           color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600));
-  await progressDialog!.show();
+  await makeVideoProgressDialog!.show();
   currentSessionIndex = index;
   sessionStepsList = await listSessionStepList(thisSessionIndex: index);
   await emptyTempDir();
@@ -451,7 +451,7 @@ Future<void> makeVideo(
       '(VA31)${concatList}....${tempDirPath}/AirStudio_concat.txt}++++${conatContents}');
   final String concatedVideo = "${tempDirPath}/AirStudio_video.${videoSuffix}";
   final String concatCommand =
-      '-y -safe 0 -f concat -i ${tempDirPath}/AirStudio_concat.txt -c copy "${concatedVideo}"';
+      '-y -safe 0 -f concat -i ${tempDirPath}/AirStudio_concat.txt -c copy  "${concatedVideo}"';
 
   // print('(VA32)${concatedVideo}....${concatCommand}');
   await ffmpegCommand(

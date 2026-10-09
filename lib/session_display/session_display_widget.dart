@@ -475,6 +475,7 @@ class _SessionDisplayWidgetState
                   ),
                   Row(children: [
                     FlutterFlowIconButton(
+                      showLoadingIndicator: true,
                       caption: 'Edit',
                       tooltipMessage: 'Edit session',
                       borderColor: Colors.transparent,
@@ -796,14 +797,14 @@ class _SessionDisplayWidgetState
                   SizedBox(height: kIconButtonGap),
                   FlutterFlowIconButton(
                       showLoadingIndicator: true,
-                      caption: 'Archive',
-                      tooltipMessage: 'Archive functions',
+                      caption: 'Delete',
+                      tooltipMessage: 'Delete AIR',
                       borderColor: Colors.transparent,
                       borderRadius: 0.0,
                       borderWidth: 1.0,
                       buttonSize: 40.0,
                       buttonWidth: kSessionIconButtonWidth,
-                      icon: Icon(Icons.archive),
+                      icon: kIconDelete,
                       onPressed: () async {
                         // currentSession = session;
                         currentSessionIndex = sessionIndex;
@@ -838,15 +839,17 @@ class _SessionDisplayWidgetState
                               return StatefulBuilder(
                                   builder: (context, setState) {
                                 return AlertDialog(
-                                  title: Text('Archive Functions'),
+                                  title: Text('Delete'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      showCreateArchiveButton(sessionIndex),
-                                      SizedBox(height: kIconButtonGap),
-                                      showArchiveRestoreButton(sessionIndex),
+                                      // showCreateArchiveButton(sessionIndex),
+                                      // SizedBox(height: kIconButtonGap),
+                                      // showArchiveRestoreButton(sessionIndex),
                                       SizedBox(height: kIconButtonGap),
                                       showAIRDeleteButton(sessionIndex),
+                                      SizedBox(height: kIconButtonGap),
+                                      Text('This cannot be undone'),
                                     ],
                                   ),
                                   actions: [
@@ -1545,14 +1548,14 @@ Future<void> restoreAIRFromCloud(int? index) async {
   List<SessionStepsRecord> sessionSteps =
       await listSessionStepList(thisSessionIndex: index?? 0);
   _utf8Encoder = utf8.encoder;
-  List<String> appDirPathList = await getAppDirListing();
+  // List<String> appDirPathList = await getAppDirListing();
   for (int j = 0; j < sessionSteps.length; j++) {
-    // print('(DA51A)${j}....${sessionSteps[j].reference!.path}');
+    print('(DA51A)${j}....${sessionSteps[j].reference!.path}');
     models.FileList filesOfStorageStep = await listStorageFilesOfStorageStep(
         bucketId: airsRef.path, sessionStepId: sessionSteps[j].reference!.path);
     for (int k = 0; k < filesOfStorageStep.files.length; k++) {
-      // print('(DA52A)${k}....${filesOfStorageStep.files[k]},,,,${sessionSteps[j].reference!.path}');
-      for (int l = 0; l < appDirPathList.length; l++) {
+      print('(DA52A)${k}....${filesOfStorageStep.files[k].name},,,,${sessionSteps[j].reference!.path}');
+      // for (int l = 0; l < appDirPathList.length; l++) {
         final String filePath =
             appDirPath! + '/' + filesOfStorageStep.files[k].$id;
         await copyAnyStorageFiletoLocal(
@@ -1560,26 +1563,26 @@ Future<void> restoreAIRFromCloud(int? index) async {
           fileId: filesOfStorageStep.files[k].$id,
           localPath: filePath,
         );
-        // print('(DA53A)${k}....${l},,,,${filesOfStorageStep.files[k].$id}++++${filePath}');
+        print('(DA53A)${k},,,,${filesOfStorageStep.files[k].$id}++++${filePath}');
       }
-    }
+    // }
   }
 }
 
 Future<void> storeAIRInCloud(int index) async {
-  print('(DA50A)');
   SessionsRecord session = sessions![index];
   List<SessionStepsRecord> sessionSteps =
       await listSessionStepList(thisSessionIndex: index);
   _utf8Encoder = utf8.encoder;
-  List<String> appDirPathList =
-      await getSessionStepAppDirListing(session.reference!.path!);
+  print('(DA50A)${sessionSteps.length}....${sessionSteps}');
   for (int j = 0; j < sessionSteps.length; j++) {
-    print('(DA51B)${j}....${sessionSteps[j].reference!.path}');
-    for (int k = 0; k < appDirPathList.length; k++) {
-      final String storageFileId = appDirPathList[k].split('/').last;
+    List<String> sessionStepPath =
+    await getSessionStepAppDirListing(sessionSteps[j].reference!.path!);
+    print('(DA51B)${j}....${sessionSteps[j].reference!.path},,,,${sessionStepPath}');
+     for (int k = 0; k < sessionStepPath.length; k++) {
+      final String storageFileId = sessionStepPath[k].split('/').last;
       print(
-          '(DA53B)${k}....${appDirPathList[k]},,,,${sessionSteps[j].reference!.path}++++${storageFileId}');
+          '(DA53B)${k}....${sessionStepPath[k]},,,,${sessionSteps[j].reference!.path}++++${storageFileId}');
       // bool fileExists = false;
       // for (int m = 0; m < storageFilesOfStep.files.length; m++){
       //   if (storageFilesOfStep.files[m].$id.contains(storageFileId)){
@@ -1596,10 +1599,10 @@ Future<void> storeAIRInCloud(int index) async {
       var response = await storeStorageFile(
         bucketId: airsRef.path!,
         storageFileId: storageFileId,
-        localFilePath: appDirPathList[k],
+        localFilePath: sessionStepPath[k],
         deleteIfNecessary: true,
       );
-      print('(DA56B)${k}....${appDirPathList[k]},,,,${response}');
+      print('(DA56B)${k}....${sessionStepPath[k]},,,,${response}');
     }
   }
   await printAppDirListing();

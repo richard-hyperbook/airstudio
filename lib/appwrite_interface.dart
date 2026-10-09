@@ -713,7 +713,7 @@ Future<models.DocumentList> listDocumentsWithOneQueryDocumentReference({
         queries: [
           Query.equal(attribute, value!.path),
           Query.limit(kLimitDatabaseListDocuments),
-          Query.orderAsc(orderByAttribute),
+          Query.orderDesc(orderByAttribute),
         ],
       );
       print('(TTP9B)${docs.documents.length}....${docs.total}++++${docs}');
@@ -872,10 +872,10 @@ Future<models.DocumentList> listDocumentsWithOneQueryString({
 }) async {
   appwriteDatabases = Databases(client!);
   models.DocumentList? docs;
-  //> print(
-  //>   '(N207A)${attribute}&&&&${value}////${databaseRef.path}ÅÅÅÅ${collection!.path}',
-  //>  );
-  //>print('(N7ZB)${appwriteDatabases}>>>>${collection}<<<<${value}');
+   print(
+     '(N207A)${attribute}&&&&${value}////${databaseRef.path}ÅÅÅÅ${collection!.path}',
+    );
+  print('(N7ZB)${appwriteDatabases}>>>>${collection}<<<<${value}');
   try {
     docs = await appwriteDatabases!.listDocuments(
       databaseId: databaseRef.path!,
@@ -883,6 +883,7 @@ Future<models.DocumentList> listDocumentsWithOneQueryString({
       queries: [
         Query.equal(attribute, value!),
         Query.limit(kLimitDatabaseListDocuments),
+
       ],
     );
   } on AppwriteException {

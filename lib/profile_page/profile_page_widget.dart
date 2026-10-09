@@ -164,7 +164,7 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
               width: MediaQuery.sizeOf(context).width * 0.9,
               child: CheckboxListTile(
                 tileColor: FlutterFlowTheme.of(context).tertiaryBackground,
-                title: const Text('Archive session data'),
+                title: const Text('Store AIRs in cloud'),
                 value: currentUser!.archiveSessions ?? false,
                 onChanged: (bool? value) {
                   setState(() {

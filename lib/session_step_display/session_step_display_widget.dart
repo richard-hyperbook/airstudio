@@ -55,12 +55,14 @@ import 'dart:async';
 import 'package:intl/intl.dart' show DateFormat;
 import '../../custom_code/widgets/trimmer3.dart';
 import '../../session_display/session_display_widget.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 http.Client _http = http.Client();
 
 int _count = 0;
 bool _iHaveRequests = false;
 List<DocumentReference?> _hyperbookListRequesting = [];
+ProgressDialog? sessionStepProgressDialog;
 
 Future<double> getFileDuration(String mediaPath) async {
   final mediaInfoSession = await FFprobeKit.getMediaInformation(mediaPath);
@@ -107,6 +109,8 @@ class _SessionStepDisplayWidgetState
     _model = createModel(context, () => SessionStepDisplayModel());
     enteredHyperbookTitleController = TextEditingController();
     enteredHyperbookTitleController.text = '';
+    sessionStepProgressDialog = ProgressDialog(context,
+        type: ProgressDialogType.normal, isDismissible: true, showLogs: true);
     // scrollController = ScrollController()
     //   ..addListener(_scrollListener);
 
@@ -571,7 +575,7 @@ class _SessionStepDisplayWidgetState
               transcriptionList.add('');
             }
           }
-
+          Icon backIcon = Icon(Icons.arrow_left, size: 50, color: Colors.black);
           return Title(
             title: 'Edit AIR',
             color: FlutterFlowTheme.of(context).primary.withAlpha(0XFF),
@@ -582,11 +586,42 @@ class _SessionStepDisplayWidgetState
                 leading: BackButton(
                   color: Colors.white,
                   onPressed: () async {
-                    await storeAIRInCloud(currentSessionIndex);
+                    await sessionStepProgressDialog!.show();
+                    sessionStepProgressDialog!.update(
+                      message: 'Please wait',
+                      progressWidget: Container(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.yellow,
+                            strokeWidth: 5,
+                            //    value: progressValue,
+                          )),
+                    );
+                    if (currentUser!.archiveSessions ?? false) {
+                      await storeAIRInCloud(currentSessionIndex);
+                    }
+                    sessionStepProgressDialog!.hide();
                     print('(FF1)');
                     Navigator.pop(context);
                   },
                 ),
+                /* leading: FlutterFlowIconButton(
+                    //fillColor: Colors.amber,
+                    showLoadingIndicator: true,
+                    caption: 'XXX',
+// captionFontSize: basicFontSize,
+                    tooltipMessage: 'Back',
+                    borderColor: Colors.transparent,
+                    borderRadius: 0.0,
+                    borderWidth: 1.0,
+                    buttonSize: 10.0,
+                    buttonWidth: 10.0,
+                    icon: backIcon,
+                    onPressed: () async {
+                      await storeAIRInCloud(currentSessionIndex);
+                      print('(FF99)');
+                      Navigator.pop(context);
+                    }),*/
                 backgroundColor: FlutterFlowTheme.of(context).primary,
                 automaticallyImplyLeading: false,
                 title: Text(
